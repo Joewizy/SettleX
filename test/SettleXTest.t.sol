@@ -49,14 +49,8 @@ contract SettleXTest is Test {
 
         // Create test token
         token = ITIP20(
-            StdPrecompiles.TIP20_FACTORY.createToken(
-                "Test AlphaUSD",
-                "tAUSD",
-                "USD",
-                StdTokens.PATH_USD,
-                address(this),
-                bytes32(0)
-            )
+            StdPrecompiles.TIP20_FACTORY
+                .createToken("Test AlphaUSD", "tAUSD", "USD", StdTokens.PATH_USD, address(this), bytes32(0))
         );
 
         // Grant issuer role
@@ -152,7 +146,7 @@ contract SettleXTest is Test {
 
         vm.startPrank(EMPLOYER1);
         token.approve(address(settleX), amount);
-        
+
         bool success = settleX.payEmployee(EMPLOYEE1, amount, token, bytes32(0));
         vm.stopPrank();
 
@@ -194,9 +188,12 @@ contract SettleXTest is Test {
         vm.prank(OWNER);
         settleX.authorizeEmployer(EMPLOYER1);
 
-        vm.prank(EMPLOYER1);
+        vm.startPrank(EMPLOYER1);
+        uint256 amount = 1_000 * 10 ** token.decimals();
+        token.approve(address(settleX), amount);
         vm.expectRevert(SettleX.InvalidAddress.selector);
-        settleX.payEmployee(address(0), 1_000 * 10 ** token.decimals(), token, MEMO_INVOICE_1);
+        settleX.payEmployee(address(0), amount, token, MEMO_INVOICE_1);
+        vm.stopPrank();
     }
 
     function test_RevertWhen_PayingZeroAmount() public {
@@ -357,13 +354,13 @@ contract SettleXTest is Test {
         vm.assume(employer != OWNER);
 
         vm.startPrank(OWNER);
-        
+
         settleX.authorizeEmployer(employer);
         assertTrue(settleX.isAuthorizedEmployer(employer));
 
         settleX.revokeEmployer(employer);
         assertFalse(settleX.isAuthorizedEmployer(employer));
-        
+
         vm.stopPrank();
     }
 }
