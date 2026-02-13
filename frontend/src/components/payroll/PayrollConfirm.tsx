@@ -74,7 +74,7 @@ export function PayrollConfirm({
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-500">Contract</span>
-            <span className="font-mono text-xs text-gray-600">SettleX</span>
+            <span className="font-mono text-xs text-gray-900">SettleX</span>
           </div>
         </div>
 

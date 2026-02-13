@@ -5,18 +5,10 @@ import {
   useWriteContract,
   useConfig,
 } from "wagmi";
-import {
-  formatUnits,
-  parseUnits,
-  encodeAbiParameters,
-  keccak256,
-  type Address,
-} from "viem";
+import { type Address } from "viem";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { SETTLEX_ADDRESS, SETTLEX_ABI } from "@/abi";
 import { TOKENS } from "@/lib/constants";
-import type { BatchEmployee } from "@/lib/types";
-
 export { TOKENS };
 
 export interface SettlementResult {
@@ -30,6 +22,7 @@ export function useSettleX() {
   const config = useConfig();
   const { writeContractAsync } = useWriteContract();
   const [settling, setSettling] = useState(false);
+  const [status, setStatus] = useState<string>('');
 
   // Read authorization status
   const { data: isAuthorized } = useReadContract({
@@ -49,27 +42,59 @@ export function useSettleX() {
     query: { enabled: !!address },
   });
 
-  // Pay a single employee via the SettleX contract
+  // Pay a single employee via SettleX contract
   const payEmployee = async (
     employee: Address,
     amount: bigint,
     token: Address,
     memo: `0x${string}`,
-  ): Promise<SettlementResult> => {
-    const txHash = await writeContractAsync({
-      address: SETTLEX_ADDRESS,
-      abi: SETTLEX_ABI,
-      functionName: "payEmployee",
-      args: [employee, amount, token, memo],
-    });
+  ): Promise<SettlementResult | null> => {
+    if (!address) {
+      setStatus('❌ Please connect wallet first.');
+      return null;
+    }
 
-    const receipt = await waitForTransactionReceipt(config, { hash: txHash });
+    setSettling(true);
+    setStatus('');
 
-    return {
-      txHash,
-      blockNumber: receipt.blockNumber,
-      gasUsed: receipt.gasUsed,
-    };
+    try {
+      setStatus('⏳ Processing payment...');
+      
+      const txHash = await writeContractAsync({
+        address: SETTLEX_ADDRESS,
+        abi: SETTLEX_ABI,
+        functionName: "payEmployee",
+        args: [employee, amount, token, memo],
+      });
+
+      setStatus('⏳ Waiting for confirmation...');
+      const receipt = await waitForTransactionReceipt(config, { hash: txHash });
+
+      if (receipt.status === 'success') {
+        setStatus('✅ Payment completed successfully!');
+      } else {
+        setStatus('❌ Payment failed. Transaction was not successful.');
+        return null;
+      }
+      
+      return {
+        txHash,
+        blockNumber: receipt.blockNumber,
+        gasUsed: receipt.gasUsed,
+      };
+    } catch (error) {
+      console.error('❌ Payment Error:', error);
+      
+      if (error instanceof Error && error.message.includes('User rejected the request')) {
+        setStatus('');
+        return null;
+      }
+      
+      setStatus('❌ Payment failed. Please try again.');
+      return null;
+    } finally {
+      setSettling(false);
+    }
   };
 
   // Record batch summary on-chain after all payments
@@ -78,113 +103,57 @@ export function useSettleX() {
     token: Address,
     totalAmount: bigint,
     employeeCount: bigint,
-  ) => {
-    const txHash = await writeContractAsync({
-      address: SETTLEX_ADDRESS,
-      abi: SETTLEX_ABI,
-      functionName: "recordBatchPayroll",
-      args: [batchId, token, totalAmount, employeeCount],
-    });
+  ): Promise<`0x${string}` | null> => {
+    if (!address) {
+      setStatus('❌ Please connect wallet first.');
+      return null;
+    }
 
-    await waitForTransactionReceipt(config, { hash: txHash });
-    return txHash;
-  };
-
-  // Execute full batch settlement: pay each employee, then record the batch
-  const settleBatch = async (
-    batch: BatchEmployee[],
-    tokenAddress: Address,
-    onEmployeeStatus: (
-      empId: number,
-      status: "processing" | "confirmed" | "failed",
-    ) => void,
-  ): Promise<{
-    results: SettlementResult[];
-    totalGas: bigint;
-    batchTxHash: `0x${string}` | null;
-  }> => {
     setSettling(true);
-    const results: SettlementResult[] = [];
-    let totalGas = 0n;
-
-    // Generate a unique batch ID
-    const batchId = keccak256(
-      encodeAbiParameters(
-        [{ type: "address" }, { type: "uint256" }],
-        [address || "0x0000000000000000000000000000000000000000", BigInt(Date.now())],
-      ),
-    ) as `0x${string}`;
+    setStatus('');
 
     try {
-      // Pay each employee sequentially
-      for (const emp of batch) {
-        onEmployeeStatus(emp.id, "processing");
+      setStatus('⏳ Recording batch payroll...');
+      
+      const txHash = await writeContractAsync({
+        address: SETTLEX_ADDRESS,
+        abi: SETTLEX_ABI,
+        functionName: "recordBatchPayroll",
+        args: [batchId, token, totalAmount, employeeCount],
+      });
 
-        try {
-          const amount = parseUnits(emp.amount.toString(), 6);
-          const memo = keccak256(
-            encodeAbiParameters(
-              [{ type: "string" }],
-              [`payroll-${emp.id}-${Date.now()}`],
-            ),
-          ) as `0x${string}`;
+      setStatus('⏳ Waiting for confirmation...');
+      const receipt = await waitForTransactionReceipt(config, { hash: txHash });
 
-          const result = await payEmployee(
-            emp.wallet as Address,
-            amount,
-            tokenAddress,
-            memo,
-          );
-
-          results.push(result);
-          totalGas += result.gasUsed;
-          onEmployeeStatus(emp.id, "confirmed");
-        } catch {
-          onEmployeeStatus(emp.id, "failed");
-          throw new Error(`Payment failed for ${emp.name}`);
-        }
+      if (receipt.status === 'success') {
+        setStatus('✅ Batch payroll recorded successfully!');
+        return txHash;
+      } else {
+        setStatus('❌ Failed to record batch payroll. Transaction was not successful.');
+        return null;
       }
-
-      // Record the batch summary on-chain
-      const totalAmount = batch.reduce(
-        (sum, emp) => sum + parseUnits(emp.amount.toString(), 6),
-        0n,
-      );
-
-      let batchTxHash: `0x${string}` | null = null;
-      try {
-        batchTxHash = await recordBatchPayroll(
-          batchId,
-          tokenAddress,
-          totalAmount,
-          BigInt(batch.length),
-        );
-      } catch {
-        // Non-critical: payments succeeded, batch record is optional
-        console.warn("Batch record failed (payments still succeeded)");
+    } catch (error) {
+      console.error('❌ Batch Recording Error:', error);
+      
+      if (error instanceof Error && error.message.includes('User rejected the request')) {
+        setStatus('');
+        return null;
       }
-
-      return { results, totalGas, batchTxHash };
+      
+      setStatus('❌ Failed to record batch payroll. Please try again.');
+      return null;
     } finally {
       setSettling(false);
     }
   };
 
-  // Derived stats
-  const totalPaid = employerStats
-    ? formatUnits((employerStats as [bigint, bigint, boolean])[0], 6)
-    : "0";
-  const paymentCount = employerStats
-    ? Number((employerStats as [bigint, bigint, boolean])[1])
-    : 0;
-
   return {
     isAuthorized: isAuthorized as boolean | undefined,
-    totalPaid,
-    paymentCount,
     settling,
+    status,
+    employerStats,
     payEmployee,
     recordBatchPayroll,
-    settleBatch,
+    setStatus,
   };
 }

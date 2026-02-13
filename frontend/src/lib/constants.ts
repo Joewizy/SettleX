@@ -65,12 +65,12 @@ export const COUNTRIES = [
 // ─── Seed Data ───────────────────────────────────────────────────────────────
 
 export const EMPLOYEES_SEED: Employee[] = [
-  { id: 1, name: "Adaeze Okafor", email: "adaeze@team.io", country: "Nigeria", flag: "🇳🇬", currency: "pathUSD", amount: 3200, wallet: "0x1a2b...9f3e", avatar: "AO", status: "active" },
-  { id: 2, name: "Carlos Mendes", email: "carlos@team.io", country: "Brazil", flag: "🇧🇷", currency: "AlphaUSD", amount: 2800, wallet: "0x4c5d...2a1b", avatar: "CM", status: "active" },
-  { id: 3, name: "Elena Vasquez", email: "elena@team.io", country: "Mexico", flag: "🇲🇽", currency: "pathUSD", amount: 1500, wallet: "0x7e8f...5c3d", avatar: "EV", status: "active" },
-  { id: 4, name: "James Liu", email: "james@team.io", country: "Singapore", flag: "🇸🇬", currency: "BetaUSD", amount: 4100, wallet: "0x2b3c...8d4e", avatar: "JL", status: "active" },
-  { id: 5, name: "Priya Sharma", email: "priya@team.io", country: "India", flag: "🇮🇳", currency: "AlphaUSD", amount: 2900, wallet: "0x6f7g...1a5b", avatar: "PS", status: "active" },
-  { id: 6, name: "Sophie Laurent", email: "sophie@team.io", country: "France", flag: "🇫🇷", currency: "ThetaUSD", amount: 3600, wallet: "0x9h0i...4c6d", avatar: "SL", status: "active" },
+  { id: 1, name: "Joseph Gimba", email: "joseph@team.io", country: "Nigeria", flag: "🇳🇬", currency: "pathUSD", amount: 3200, wallet: "0x827A26b04C9680DbBE48b6149BbC5f0Eae7CeAD9", avatar: "JG", status: "active" },
+  { id: 2, name: "Carlos Mendes", email: "carlos@team.io", country: "Brazil", flag: "🇧🇷", currency: "AlphaUSD", amount: 2800, wallet: "0x2edDfFE0c9D272786B6946d6e9E488C95fB81786", avatar: "CM", status: "active" },
+  { id: 3, name: "Elena Vasquez", email: "elena@team.io", country: "Mexico", flag: "🇲🇽", currency: "pathUSD", amount: 1500, wallet: "0x0D30E14f16E95630196C17ffd28E3794eEBdd5D7", avatar: "EV", status: "active" },
+  { id: 4, name: "James Liu", email: "james@team.io", country: "Singapore", flag: "🇸🇬", currency: "BetaUSD", amount: 4100, wallet: "0xee30E5b391aBf6Bf36a646FddfEaf256512d6B9D", avatar: "JL", status: "active" },
+  { id: 5, name: "Priya Sharma", email: "priya@team.io", country: "India", flag: "🇮🇳", currency: "AlphaUSD", amount: 2900, wallet: "0x63B96A0A7CbEdb9DBF474048B1079F094589494a", avatar: "PS", status: "active" },
+  { id: 6, name: "Sophie Laurent", email: "sophie@team.io", country: "France", flag: "🇫🇷", currency: "ThetaUSD", amount: 3600, wallet: "0x623f1694De567D722557Bc6f17422E68cDE0329b", avatar: "SL", status: "active" },
 ];
 
 export const PAYROLL_HISTORY_SEED: PayrollRecord[] = [

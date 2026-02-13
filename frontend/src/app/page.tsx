@@ -16,8 +16,8 @@ import {
   useHistory,
   useBatch,
 } from "@/hooks/useAppState";
-import { useSettleX } from "@/hooks/useSettleX";
 import { useToken } from "@/hooks/useToken";
+import { usePayment } from "@/hooks/usePayment";
 import { DEFAULT_TOKEN } from "@/lib/constants";
 
 export default function SettleXApp() {
@@ -27,9 +27,9 @@ export default function SettleXApp() {
   const payroll = usePayroll(team.activeEmployees);
   const history = useHistory();
   const batch = useBatch();
-  const settleX = useSettleX();
+  const payment = usePayment();
 
-  // Token approval state — uses the default token for now
+  // Token approval state — uses default token for now
   const [payrollToken] = useState(DEFAULT_TOKEN);
   const token = useToken(payrollToken.address);
 
@@ -40,27 +40,20 @@ export default function SettleXApp() {
     }
   };
 
-  // Approve tokens for the SettleX contract
+  // Approve tokens for the SettleX contract - auto-approve if needed
   const handleApprove = useCallback(async () => {
     const totalAmount = payroll.batchTotal + 0.001;
     await token.approve(totalAmount.toString());
   }, [token, payroll.batchTotal]);
 
-  // Check if approved: allowance >= batch total
-  const isApproved = (() => {
-    try {
-      const allowanceBigInt = parseUnits(token.allowance, 6);
-      const requiredBigInt = parseUnits(payroll.batchTotal.toString(), 6);
-      return allowanceBigInt >= requiredBigInt && requiredBigInt > 0n;
-    } catch {
-      return false;
-    }
-  })();
-
-  // Start settlement using the real SettleX contract
-  const handleStartSettlement = useCallback(() => {
-    payroll.startSettlement(settleX.settleBatch, payrollToken.address);
-  }, [payroll, settleX.settleBatch, payrollToken.address]);
+  // Start settlement using the real SettleX contract - with auto-approval
+  const handleStartSettlement = useCallback(async () => {
+    // Auto-approve first if needed using the token hook
+    await token.ensureApproval((payroll.batchTotal + 0.001).toString());
+    
+    // Then start settlement
+    payroll.startSettlement(payment.processPayment, payrollToken.address);
+  }, [payroll, payment.processPayment, payrollToken.address, token]);
 
   return (
     <div className="flex min-h-screen">
@@ -93,7 +86,7 @@ export default function SettleXApp() {
             settlementTxData={payroll.settlementTxData}
             settlementError={payroll.settlementError}
             isApproving={token.loading}
-            isApproved={isApproved}
+            isApproved={token.hasAllowance}
             isConnected={isConnected}
             onSetStep={payroll.setPayrollStep}
             onSetEditingAmount={payroll.setEditingAmount}

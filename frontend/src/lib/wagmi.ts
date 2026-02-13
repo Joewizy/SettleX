@@ -1,26 +1,24 @@
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { http } from "wagmi";
-import { defineChain } from "viem";
-
-export const tempoTestnet = defineChain({
-  id: 42_429,
-  name: "Tempo Testnet",
-  nativeCurrency: { name: "USD", symbol: "USD", decimals: 18 },
-  rpcUrls: {
-    default: { http: ["https://rpc.moderato.tempo.xyz"] },
-  },
-  blockExplorers: {
-    default: { name: "Tempo Explorer", url: "https://explore.tempo.xyz" },
-  },
-  testnet: true,
-});
+import { createWalletClient } from "viem";
+import { privateKeyToAccount } from 'viem/accounts';
+import { tempoModerato } from 'viem/chains';
 
 export const wagmiConfig = getDefaultConfig({
   appName: "SettleX",
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "",
-  chains: [tempoTestnet],
-  transports: {
-    [tempoTestnet.id]: http(),
-  },
+  chains: [tempoModerato],
   ssr: true,
 });
+
+
+if (!process.env.NEXT_PUBLIC_PRIVATE_KEY) {
+  throw new Error('PRIVATE_KEY environment variable is required');
+}
+
+// client we would use to batch txs
+export const client = createWalletClient({
+  account: privateKeyToAccount(process.env.NEXT_PUBLIC_PRIVATE_KEY as `0x${string}`),
+  chain: tempoModerato,
+  transport: http()
+})

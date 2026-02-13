@@ -160,7 +160,7 @@ export function usePayroll(activeEmployees: Employee[]) {
   // Real blockchain settlement via the SettleX contract
   const startSettlement = useCallback(
     async (
-      settleBatch: (
+      settleFunction: (
         batch: BatchEmployee[],
         tokenAddress: `0x${string}`,
         onStatus: (empId: number, status: "processing" | "confirmed" | "failed") => void,
@@ -168,8 +168,12 @@ export function usePayroll(activeEmployees: Employee[]) {
         results: { txHash: `0x${string}`; blockNumber: bigint; gasUsed: bigint }[];
         totalGas: bigint;
         batchTxHash: `0x${string}` | null;
+        transactionFee?: string;
+        settlementTime?: string;
+        blockNumber?: bigint;
       }>,
       tokenAddress: `0x${string}`,
+      isSinglePayment: boolean = false,
     ) => {
       setPayrollStep(3);
       setSettlementError(null);
@@ -186,22 +190,35 @@ export function usePayroll(activeEmployees: Employee[]) {
       const startTime = Date.now();
 
       try {
-        const { results, totalGas } = await settleBatch(
+        const { results, totalGas, batchTxHash, transactionFee, settlementTime, blockNumber } = await settleFunction(
           payrollBatch,
           tokenAddress,
-          (empId, status) => {
+          (empId: number, status: "processing" | "confirmed" | "failed") => {
             setSettlementStatus((prev) => ({ ...prev, [empId]: status }));
           },
         );
 
+        // Use batch transaction data for batch payments
+        const txHashToUse = batchTxHash || results[results.length - 1]?.txHash || "0x";
+        const blockNumberToUse = blockNumber?.toString() || results[results.length - 1]?.blockNumber?.toString() || "0";
+        
+        console.log('🔍 useAppState - settlement data:', {
+          batchTxHash,
+          blockNumber,
+          resultsCount: results.length,
+          lastResult: results[results.length - 1],
+          txHashToUse,
+          blockNumberToUse
+        });
+        
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-        const lastResult = results[results.length - 1];
 
         setSettlementTxData({
-          txHash: lastResult?.txHash || "0x",
-          blockNumber: lastResult?.blockNumber.toString() || "0",
+          txHash: txHashToUse,
+          blockNumber: blockNumberToUse,
           gasUsed: totalGas.toLocaleString(),
-          settlementTime: `${elapsed}s`,
+          gasCostUsd: transactionFee || '0.000000',
+          settlementTime: settlementTime || `${elapsed}s`,
         });
         setSettlementComplete(true);
       } catch (error) {

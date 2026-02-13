@@ -84,6 +84,25 @@ export function useToken(tokenAddress: Address) {
     }
   };
 
+  // Ensure approval - auto-approve if allowance is insufficient
+  const ensureApproval = async (requiredAmount?: string) => {
+    try {
+      const allowanceBigInt = allowance as bigint;
+      const requiredBigInt = requiredAmount 
+        ? parseUnits(requiredAmount, 6)
+        : parseUnits("1000000", 6);
+      
+      // Only approve if allowance is insufficient
+      if (allowanceBigInt < requiredBigInt) {
+        const approvalAmount = requiredAmount || "1000000";
+        await approve(approvalAmount);
+      }
+    } catch {
+      // Fall back to manual approval
+      return false;
+    }
+  };
+
   // Derived values
   const currentAllowance = allowance
     ? formatUnits(allowance as bigint, 6)
@@ -110,6 +129,7 @@ export function useToken(tokenAddress: Address) {
     hasAllowance,
     tokenName,
     approve,
+    ensureApproval,
     refetchAllowance,
     refetchBalance,
     status,

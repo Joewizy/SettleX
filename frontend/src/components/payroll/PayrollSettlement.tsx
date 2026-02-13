@@ -150,8 +150,8 @@ export function PayrollSettlement({
                 <span className="font-mono text-xs text-gray-600">#{settlementTxData.blockNumber}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Total Gas Used</span>
-                <span className="font-mono text-xs text-gray-600">{settlementTxData.gasUsed} gas</span>
+                <span className="text-gray-500">Transaction Fee</span>
+                <span className="font-mono text-xs text-gray-600">${settlementTxData.gasCostUsd || '0.000000'}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Settlement Time</span>

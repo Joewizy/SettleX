@@ -4,190 +4,540 @@ export const SETTLEX_ADDRESS: Address =
   "0x079c4dFC2B330F720A29FDea2cD5C920606b13c8";
 
 export const SETTLEX_ABI = [
-  // ============ Write Functions ============
   {
-    type: "function",
-    name: "payEmployee",
-    stateMutability: "nonpayable",
-    inputs: [
-      { name: "employee", type: "address" },
-      { name: "amount", type: "uint256" },
-      { name: "token", type: "address" },
-      { name: "memo", type: "bytes32" },
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "EmptyBatch",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidAddress",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidAmount",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
     ],
-    outputs: [{ name: "", type: "bool" }],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
   },
   {
-    type: "function",
-    name: "recordBatchPayroll",
-    stateMutability: "nonpayable",
-    inputs: [
-      { name: "batchId", type: "bytes32" },
-      { name: "token", type: "address" },
-      { name: "totalAmount", type: "uint256" },
-      { name: "employeeCount", type: "uint256" },
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
     ],
-    outputs: [],
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
   },
   {
-    type: "function",
-    name: "authorizeEmployer",
-    stateMutability: "nonpayable",
-    inputs: [{ name: "employer", type: "address" }],
-    outputs: [],
+    "inputs": [],
+    "name": "TransferFailed",
+    "type": "error"
   },
   {
-    type: "function",
-    name: "revokeEmployer",
-    stateMutability: "nonpayable",
-    inputs: [{ name: "employer", type: "address" }],
-    outputs: [],
-  },
-
-  // ============ View Functions ============
-  {
-    type: "function",
-    name: "isAuthorizedEmployer",
-    stateMutability: "view",
-    inputs: [{ name: "employer", type: "address" }],
-    outputs: [{ name: "", type: "bool" }],
+    "inputs": [],
+    "name": "Unauthorized",
+    "type": "error"
   },
   {
-    type: "function",
-    name: "getEmployerStats",
-    stateMutability: "view",
-    inputs: [{ name: "employer", type: "address" }],
-    outputs: [
-      { name: "totalPaid", type: "uint256" },
-      { name: "paymentCount", type: "uint256" },
-      { name: "isAuthorized", type: "bool" },
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "employer",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "batchId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "contract ITIP20",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "employeeCount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
     ],
+    "name": "BatchPayrollExecuted",
+    "type": "event"
   },
   {
-    type: "function",
-    name: "getEmployerTokenStats",
-    stateMutability: "view",
-    inputs: [
-      { name: "employer", type: "address" },
-      { name: "token", type: "address" },
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "employer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
     ],
-    outputs: [{ name: "totalPaid", type: "uint256" }],
+    "name": "EmployerAuthorized",
+    "type": "event"
   },
   {
-    type: "function",
-    name: "totalPayments",
-    stateMutability: "view",
-    inputs: [],
-    outputs: [{ name: "", type: "uint256" }],
-  },
-  {
-    type: "function",
-    name: "owner",
-    stateMutability: "view",
-    inputs: [],
-    outputs: [{ name: "", type: "address" }],
-  },
-
-  // ============ Events ============
-  {
-    type: "event",
-    name: "PaymentExecuted",
-    inputs: [
-      { name: "employer", type: "address", indexed: true },
-      { name: "employee", type: "address", indexed: true },
-      { name: "token", type: "address", indexed: true },
-      { name: "amount", type: "uint256", indexed: false },
-      { name: "memo", type: "bytes32", indexed: false },
-      { name: "timestamp", type: "uint256", indexed: false },
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "employer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
     ],
+    "name": "EmployerRevoked",
+    "type": "event"
   },
   {
-    type: "event",
-    name: "BatchPayrollExecuted",
-    inputs: [
-      { name: "employer", type: "address", indexed: true },
-      { name: "batchId", type: "bytes32", indexed: true },
-      { name: "token", type: "address", indexed: true },
-      { name: "totalAmount", type: "uint256", indexed: false },
-      { name: "employeeCount", type: "uint256", indexed: false },
-      { name: "timestamp", type: "uint256", indexed: false },
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
     ],
+    "name": "OwnershipTransferred",
+    "type": "event"
   },
   {
-    type: "event",
-    name: "EmployerAuthorized",
-    inputs: [
-      { name: "employer", type: "address", indexed: true },
-      { name: "timestamp", type: "uint256", indexed: false },
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "employer",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "employee",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "contract ITIP20",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "memo",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
     ],
+    "name": "PaymentExecuted",
+    "type": "event"
   },
   {
-    type: "event",
-    name: "EmployerRevoked",
-    inputs: [
-      { name: "employer", type: "address", indexed: true },
-      { name: "timestamp", type: "uint256", indexed: false },
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "employer",
+        "type": "address"
+      }
     ],
+    "name": "authorizeEmployer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
-
-  // ============ Errors ============
-  { type: "error", name: "Unauthorized", inputs: [] },
-  { type: "error", name: "InvalidAddress", inputs: [] },
-  { type: "error", name: "InvalidAmount", inputs: [] },
-  { type: "error", name: "TransferFailed", inputs: [] },
-  { type: "error", name: "EmptyBatch", inputs: [] },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "authorizedEmployers",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "employer",
+        "type": "address"
+      }
+    ],
+    "name": "getEmployerStats",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "totalPaid",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "paymentCount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isAuthorized",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "employer",
+        "type": "address"
+      },
+      {
+        "internalType": "contract ITIP20",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "getEmployerTokenStats",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "totalPaid",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "employer",
+        "type": "address"
+      }
+    ],
+    "name": "isAuthorizedEmployer",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "contract ITIP20",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "paidByEmployerPerToken",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "employee",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "contract ITIP20",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "memo",
+        "type": "bytes32"
+      }
+    ],
+    "name": "payEmployee",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "paymentCountByEmployer",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "batchId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "contract ITIP20",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "employeeCount",
+        "type": "uint256"
+      }
+    ],
+    "name": "recordBatchPayroll",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "employer",
+        "type": "address"
+      }
+    ],
+    "name": "revokeEmployer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "totalPaidByEmployer",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalPayments",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
 ] as const;
 
 export const ERC20_ABI = [
   {
-    type: "function",
-    name: "allowance",
-    stateMutability: "view",
+    type: 'function',
+    name: 'approve',
+    stateMutability: 'nonpayable',
     inputs: [
-      { name: "owner", type: "address" },
-      { name: "spender", type: "address" },
+      { name: 'spender', type: 'address' },
+      { name: 'amount', type: 'uint256' },
     ],
-    outputs: [{ name: "", type: "uint256" }],
+    outputs: [{ name: '', type: 'bool' }],
   },
   {
-    type: "function",
-    name: "approve",
-    stateMutability: "nonpayable",
+    type: 'function',
+    name: 'allowance',
+    stateMutability: 'view',
     inputs: [
-      { name: "spender", type: "address" },
-      { name: "amount", type: "uint256" },
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
     ],
-    outputs: [{ name: "", type: "bool" }],
+    outputs: [{ name: '', type: 'uint256' }],
   },
   {
-    type: "function",
-    name: "balanceOf",
-    stateMutability: "view",
-    inputs: [{ name: "account", type: "address" }],
-    outputs: [{ name: "", type: "uint256" }],
+    type: 'function',
+    name: 'balanceOf',
+    stateMutability: 'view',
+    inputs: [{ name: 'account', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }],
   },
   {
-    type: "function",
-    name: "decimals",
-    stateMutability: "view",
+    type: 'function',
+    name: 'decimals',
+    stateMutability: 'view',
     inputs: [],
-    outputs: [{ name: "", type: "uint8" }],
+    outputs: [{ name: '', type: 'uint8' }],
   },
   {
-    type: "function",
-    name: "symbol",
-    stateMutability: "view",
+    type: 'function',
+    name: 'symbol',
+    stateMutability: 'view',
     inputs: [],
-    outputs: [{ name: "", type: "string" }],
+    outputs: [{ name: '', type: 'string' }],
   },
   {
-    type: "function",
-    name: "transfer",
-    stateMutability: "nonpayable",
+    type: 'function',
+    name: 'transfer',
+    stateMutability: 'nonpayable',
     inputs: [
-      { name: "to", type: "address" },
-      { name: "amount", type: "uint256" },
+      { name: 'to', type: 'address' },
+      { name: 'amount', type: 'uint256' },
     ],
-    outputs: [{ name: "", type: "bool" }],
+    outputs: [{ name: '', type: 'bool' }],
   },
 ] as const;

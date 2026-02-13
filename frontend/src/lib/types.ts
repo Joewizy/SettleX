@@ -72,6 +72,7 @@ export interface SettlementTxData {
   txHash: string;
   blockNumber: string;
   gasUsed: string;
+  gasCostUsd: string;
   settlementTime: string;
 }
 
