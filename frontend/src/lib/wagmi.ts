@@ -4,13 +4,20 @@ import { createWalletClient } from "viem";
 import { privateKeyToAccount } from 'viem/accounts';
 import { tempoModerato } from 'viem/chains';
 
-export const wagmiConfig = getDefaultConfig({
-  appName: "SettleX",
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "",
-  chains: [tempoModerato],
-  ssr: true,
-});
+// Lazy-initialized to avoid WalletConnect accessing indexedDB during SSR
+let _wagmiConfig: ReturnType<typeof getDefaultConfig> | null = null;
 
+export function getWagmiConfig() {
+  if (!_wagmiConfig) {
+    _wagmiConfig = getDefaultConfig({
+      appName: "SettleX",
+      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "",
+      chains: [tempoModerato],
+      ssr: true,
+    });
+  }
+  return _wagmiConfig;
+}
 
 if (!process.env.NEXT_PUBLIC_PRIVATE_KEY) {
   throw new Error('PRIVATE_KEY environment variable is required');

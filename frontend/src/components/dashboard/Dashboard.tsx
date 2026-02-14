@@ -197,10 +197,6 @@ export function Dashboard({ employeeCount, onNavigate, onExpandHistory, employer
               <span className="font-semibold text-slate-900">{formatCurrency(monthlyCost)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-500">FX Fee (0.5%):</span>
-              <span className="font-medium text-slate-700">{formatCurrency(monthlyCost * 0.005)}</span>
-            </div>
-            <div className="flex justify-between text-sm">
               <span className="text-slate-500">Network Fee:</span>
               <span className="font-medium text-emerald-600">$0.001</span>
             </div>
@@ -208,7 +204,7 @@ export function Dashboard({ employeeCount, onNavigate, onExpandHistory, employer
             <div className="flex justify-between">
               <span className="text-base font-bold text-slate-900">Total:</span>
               <span className="text-xl font-bold text-slate-900">
-                {formatCurrency(monthlyCost + monthlyCost * 0.005 + 0.001)}
+                {formatCurrency(monthlyCost + 0.001)}
               </span>
             </div>
           </div>
