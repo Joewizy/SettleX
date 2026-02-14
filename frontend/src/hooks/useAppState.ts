@@ -8,6 +8,7 @@ import type {
   Employee,
   HistoryFilter,
   NewEmployeeForm,
+  PayrollRecord,
 } from "@/lib/types";
 import { EMPLOYEES_SEED } from "@/lib/constants";
 import { getInitials } from "@/lib/utils";
@@ -108,6 +109,7 @@ export function usePayroll(activeEmployees: Employee[]) {
   const [settlementError, setSettlementError] = useState<string | null>(null);
   const [editingAmount, setEditingAmount] = useState<number | null>(null);
   const [showAddToBatch, setShowAddToBatch] = useState(false);
+  const [autoSwapEnabled, setAutoSwapEnabled] = useState(false);
 
   // Initialize batch from active employees
   useEffect(() => {
@@ -164,6 +166,7 @@ export function usePayroll(activeEmployees: Employee[]) {
         batch: BatchEmployee[],
         tokenAddress: `0x${string}`,
         onStatus: (empId: number, status: "processing" | "confirmed" | "failed") => void,
+        autoSwap?: boolean,
       ) => Promise<{
         results: { txHash: `0x${string}`; blockNumber: bigint; gasUsed: bigint }[];
         totalGas: bigint;
@@ -174,6 +177,7 @@ export function usePayroll(activeEmployees: Employee[]) {
       }>,
       tokenAddress: `0x${string}`,
       isSinglePayment: boolean = false,
+      onSettlementComplete?: (txData: SettlementTxData, batch: BatchEmployee[]) => void,
     ) => {
       setPayrollStep(3);
       setSettlementError(null);
@@ -196,6 +200,7 @@ export function usePayroll(activeEmployees: Employee[]) {
           (empId: number, status: "processing" | "confirmed" | "failed") => {
             setSettlementStatus((prev) => ({ ...prev, [empId]: status }));
           },
+          autoSwapEnabled,
         );
 
         // Use batch transaction data for batch payments
@@ -213,20 +218,25 @@ export function usePayroll(activeEmployees: Employee[]) {
         
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 
-        setSettlementTxData({
+        const txData: SettlementTxData = {
           txHash: txHashToUse,
           blockNumber: blockNumberToUse,
           gasUsed: totalGas.toLocaleString(),
           gasCostUsd: transactionFee || '0.000000',
           settlementTime: settlementTime || `${elapsed}s`,
-        });
+        };
+
+        setSettlementTxData(txData);
         setSettlementComplete(true);
+
+        // Notify caller so they can save history / refetch stats
+        onSettlementComplete?.(txData, payrollBatch);
       } catch (error) {
         const msg = error instanceof Error ? error.message : "Settlement failed";
         setSettlementError(msg);
       }
     },
-    [payrollBatch],
+    [payrollBatch, autoSwapEnabled],
   );
 
   return {
@@ -241,6 +251,8 @@ export function usePayroll(activeEmployees: Employee[]) {
     setEditingAmount,
     showAddToBatch,
     setShowAddToBatch,
+    autoSwapEnabled,
+    setAutoSwapEnabled,
     batchTotal,
     currencyBreakdown,
     confirmedCount,
@@ -264,4 +276,65 @@ export function useBatch() {
   const [expandedBatch, setExpandedBatch] = useState<string | null>(null);
 
   return { expandedBatch, setExpandedBatch };
+}
+
+// Persisted payroll history (saved to localStorage)
+const HISTORY_STORAGE_KEY = "settlex_payroll_history";
+
+function loadHistory(): PayrollRecord[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory(records: PayrollRecord[]) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(records));
+}
+
+export function usePayrollHistory() {
+  const [records, setRecords] = useState<PayrollRecord[]>([]);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    setRecords(loadHistory());
+  }, []);
+
+  const addRecord = useCallback(
+    (txData: SettlementTxData, batch: BatchEmployee[]) => {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+
+      const batchTotal = batch.reduce((s, e) => s + e.amount, 0);
+      const id = `PR-${String(now.getTime()).slice(-4)}`;
+
+      const record: PayrollRecord = {
+        id,
+        date: dateStr,
+        employees: batch.length,
+        total: batchTotal,
+        fee: `$${txData.gasCostUsd}`,
+        txHash: txData.txHash,
+        status: "completed",
+        settlementTime: txData.settlementTime,
+      };
+
+      setRecords((prev) => {
+        const updated = [record, ...prev];
+        saveHistory(updated);
+        return updated;
+      });
+    },
+    [],
+  );
+
+  return { records, addRecord };
 }

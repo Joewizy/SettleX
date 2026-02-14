@@ -1,6 +1,11 @@
 import type { Employee, PayrollRecord, BatchRecord, TokenInfo } from "./types";
 import type { Address } from "viem";
 
+// ─── Tempo DEX (Enshrined Precompile) ───────────────────────────────────────
+
+export const STABLECOIN_DEX_ADDRESS: Address =
+  "0xDEc0000000000000000000000000000000000000";
+
 // ─── Tempo Testnet Tokens ────────────────────────────────────────────────────
 
 export const TOKENS: Record<string, TokenInfo> = {
@@ -43,6 +48,8 @@ export const AVATAR_COLORS: Record<string, string> = {
   JL: "bg-orange-500",
   PS: "bg-pink-500",
   SL: "bg-indigo-500",
+  JG: "bg-emerald-600",
+  AP: "bg-sky-500",
 };
 
 // ─── Countries ───────────────────────────────────────────────────────────────

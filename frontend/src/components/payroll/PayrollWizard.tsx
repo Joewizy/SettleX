@@ -22,6 +22,8 @@ interface PayrollWizardProps {
   isApproving: boolean;
   isApproved: boolean;
   isConnected: boolean;
+  autoSwapEnabled: boolean;
+  sourceTokenSymbol: string;
   onSetStep: (step: PayrollStep) => void;
   onSetEditingAmount: (id: number | null) => void;
   onUpdateAmount: (id: number, amount: number) => void;
@@ -34,6 +36,7 @@ interface PayrollWizardProps {
   onStartSettlement: () => void;
   onResetPayroll: () => void;
   onNavigate: (page: Page) => void;
+  onToggleAutoSwap: (enabled: boolean) => void;
 }
 
 export function PayrollWizard({
@@ -52,6 +55,8 @@ export function PayrollWizard({
   isApproving,
   isApproved,
   isConnected,
+  autoSwapEnabled,
+  sourceTokenSymbol,
   onSetStep,
   onSetEditingAmount,
   onUpdateAmount,
@@ -64,11 +69,15 @@ export function PayrollWizard({
   onStartSettlement,
   onResetPayroll,
   onNavigate,
+  onToggleAutoSwap,
 }: PayrollWizardProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Run Payroll</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Run Payroll</h1>
+          <p className="text-sm text-slate-500 mt-1">Process batch payments to your team</p>
+        </div>
         <StepIndicator currentStep={step} />
       </div>
 
@@ -99,9 +108,12 @@ export function PayrollWizard({
           isApproving={isApproving}
           isApproved={isApproved}
           isConnected={isConnected}
+          autoSwapEnabled={autoSwapEnabled}
+          sourceTokenSymbol={sourceTokenSymbol}
           onBack={() => onSetStep(1)}
           onApprove={onApprove}
           onSend={onStartSettlement}
+          onToggleAutoSwap={onToggleAutoSwap}
         />
       )}
 

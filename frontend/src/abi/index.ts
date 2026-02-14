@@ -488,6 +488,32 @@ export const SETTLEX_ABI = [
   }
 ] as const;
 
+export const STABLECOIN_DEX_ABI = [
+  {
+    type: 'function',
+    name: 'swapExactAmountIn',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'tokenIn', type: 'address' },
+      { name: 'tokenOut', type: 'address' },
+      { name: 'amountIn', type: 'uint128' },
+      { name: 'minAmountOut', type: 'uint128' },
+    ],
+    outputs: [{ name: 'amountOut', type: 'uint128' }],
+  },
+  {
+    type: 'function',
+    name: 'quoteSwapExactAmountIn',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'tokenIn', type: 'address' },
+      { name: 'tokenOut', type: 'address' },
+      { name: 'amountIn', type: 'uint128' },
+    ],
+    outputs: [{ name: 'amountOut', type: 'uint128' }],
+  },
+] as const;
+
 export const ERC20_ABI = [
   {
     type: 'function',

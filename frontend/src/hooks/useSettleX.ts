@@ -2,19 +2,29 @@ import { useState } from "react";
 import {
   useAccount,
   useReadContract,
+  useReadContracts,
   useWriteContract,
   useConfig,
 } from "wagmi";
-import { type Address } from "viem";
+import { type Address, formatUnits } from "viem";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { SETTLEX_ADDRESS, SETTLEX_ABI } from "@/abi";
-import { TOKENS } from "@/lib/constants";
+import { TOKENS, TOKEN_LIST } from "@/lib/constants";
 export { TOKENS };
 
 export interface SettlementResult {
   txHash: `0x${string}`;
   blockNumber: bigint;
   gasUsed: bigint;
+}
+
+export interface EmployerStatsData {
+  totalPaid: bigint;
+  totalPaidFormatted: string;
+  paymentCount: number;
+  isAuthorized: boolean;
+  totalGlobalPayments: number;
+  tokenBreakdown: { symbol: string; amount: bigint; formatted: string }[];
 }
 
 export function useSettleX() {
@@ -34,13 +44,65 @@ export function useSettleX() {
   });
 
   // Read employer stats
-  const { data: employerStats } = useReadContract({
+  const { data: employerStats, refetch: refetchEmployerStats } = useReadContract({
     address: SETTLEX_ADDRESS,
     abi: SETTLEX_ABI,
     functionName: "getEmployerStats",
     args: address ? [address] : undefined,
     query: { enabled: !!address },
   });
+
+  // Read global total payments
+  const { data: totalGlobalPayments, refetch: refetchTotalPayments } = useReadContract({
+    address: SETTLEX_ADDRESS,
+    abi: SETTLEX_ABI,
+    functionName: "totalPayments",
+    query: { enabled: !!address },
+  });
+
+  // Read per-token stats for all tokens
+  const tokenStatsContracts = TOKEN_LIST.map((t) => ({
+    address: SETTLEX_ADDRESS,
+    abi: SETTLEX_ABI,
+    functionName: "getEmployerTokenStats" as const,
+    args: address ? [address, t.address] : undefined,
+  }));
+
+  const { data: tokenStatsResults, refetch: refetchTokenStats } = useReadContracts({
+    contracts: tokenStatsContracts,
+    query: { enabled: !!address },
+  });
+
+  // Compose parsed stats
+  const parsedStats: EmployerStatsData | null = (() => {
+    if (!employerStats) return null;
+    const [totalPaid, paymentCount, authorized] = employerStats as [bigint, bigint, boolean];
+
+    const tokenBreakdown = TOKEN_LIST.map((t, i) => {
+      const raw = tokenStatsResults?.[i]?.result as bigint | undefined;
+      const amount = raw ?? 0n;
+      return {
+        symbol: t.symbol,
+        amount,
+        formatted: formatUnits(amount, t.decimals),
+      };
+    }).filter((t) => t.amount > 0n);
+
+    return {
+      totalPaid,
+      totalPaidFormatted: formatUnits(totalPaid, 6),
+      paymentCount: Number(paymentCount),
+      isAuthorized: authorized,
+      totalGlobalPayments: Number(totalGlobalPayments ?? 0n),
+      tokenBreakdown,
+    };
+  })();
+
+  const refetchStats = () => {
+    refetchEmployerStats();
+    refetchTotalPayments();
+    refetchTokenStats();
+  };
 
   // Pay a single employee via SettleX contract
   const payEmployee = async (
@@ -152,6 +214,8 @@ export function useSettleX() {
     settling,
     status,
     employerStats,
+    parsedStats,
+    refetchStats,
     payEmployee,
     recordBatchPayroll,
     setStatus,

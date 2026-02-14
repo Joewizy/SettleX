@@ -16,36 +16,40 @@ export function usePayment() {
   ) => {
     const amountWei = parseUnits(employee.amount.toString(), 6);
     const memoBytes32 = `0x${Buffer.from(memo).toString('hex').padEnd(64, '0')}`;
-    
+
     const result = await payEmployee(
       employee.wallet as Address,
       amountWei,
       tokenAddress,
       memoBytes32 as `0x${string}`
     );
-    
+
     return result;
   }, [payEmployee]);
 
   // Pay multiple employees (batch)
   const payMultipleEmployees = useCallback(async (
     employees: BatchEmployee[],
-    tokenAddress: Address
+    tokenAddress: Address,
+    autoSwapEnabled: boolean = false
   ) => {
     const batchPayments: BatchPayment[] = employees.map(emp => ({
       employee: emp.wallet as Address,
       amount: emp.amount.toString(),
-      memo: `Payment to ${emp.name}`
+      memo: `Payment to ${emp.name}`,
+      name: emp.name,
+      email: emp.email,
+      currency: emp.currency,
     }));
 
-    const result = await sendBatchPayment(batchPayments, tokenAddress);
-    
+    const result = await sendBatchPayment(batchPayments, tokenAddress, autoSwapEnabled);
+
     // Only record batch on-chain if successful
     if (result && result.status === 'success') {
       const totalAmount = employees.reduce((sum, emp) => sum + emp.amount, 0);
       const totalAmountWei = parseUnits(totalAmount.toString(), 6);
       const batchId = `0x${Date.now().toString(16).padStart(64, '0')}`;
-      
+
       await recordBatchPayroll(
         batchId as `0x${string}`,
         tokenAddress,
@@ -53,7 +57,7 @@ export function usePayment() {
         BigInt(employees.length)
       );
     }
-    
+
     return result;
   }, [sendBatchPayment, recordBatchPayroll]);
 
@@ -61,13 +65,14 @@ export function usePayment() {
   const processPayment = useCallback(async (
     employees: BatchEmployee[],
     tokenAddress: Address,
-    onStatus?: (empId: number, status: "processing" | "confirmed" | "failed") => void
+    onStatus?: (empId: number, status: "processing" | "confirmed" | "failed") => void,
+    autoSwapEnabled: boolean = false
   ) => {
     if (employees.length === 1) {
       // Single employee payment
       const employee = employees[0];
       onStatus?.(employee.id, "processing");
-      
+
       try {
         const result = await paySingleEmployee(employee, tokenAddress);
         if (result) {
@@ -75,7 +80,7 @@ export function usePayment() {
         } else {
           onStatus?.(employee.id, "failed");
         }
-        
+
         return {
           results: result ? [{
             txHash: result.txHash,
@@ -92,16 +97,16 @@ export function usePayment() {
     } else {
       // Batch payment
       employees.forEach(emp => onStatus?.(emp.id, "processing"));
-      
+
       try {
-        const result = await payMultipleEmployees(employees, tokenAddress);
+        const result = await payMultipleEmployees(employees, tokenAddress, autoSwapEnabled);
 
         if (result && result.status === 'success') {
           employees.forEach(emp => onStatus?.(emp.id, "confirmed"));
         } else {
           employees.forEach(emp => onStatus?.(emp.id, "failed"));
         }
-        
+
         const returnData = {
           results: [],
           totalGas: result?.gasUsed || 0n,
@@ -110,7 +115,7 @@ export function usePayment() {
           batchTxHash: result?.batchTxHash || null,
           blockNumber: result?.blockNumber || 0n
         };
-        
+
         return returnData;
       } catch (error) {
         employees.forEach(emp => onStatus?.(emp.id, "failed"));

@@ -1,6 +1,7 @@
 "use client";
 
-import { Plus, ArrowRight, X } from "lucide-react";
+import { Plus, ArrowRight, X, Search } from "lucide-react";
+import { useState } from "react";
 import { Avatar } from "@/components/ui";
 import { AddToBatchModal } from "./AddToBatchModal";
 import { TOKEN_LIST } from "@/lib/constants";
@@ -40,22 +41,48 @@ export function PayrollReview({
   onCloseAddModal,
   onContinue,
 }: PayrollReviewProps) {
+  const [search, setSearch] = useState("");
+
+  const filteredBatch = batch.filter(
+    (emp) =>
+      emp.name.toLowerCase().includes(search.toLowerCase()) ||
+      emp.country.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div>
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-gray-900">Payroll Batch</h2>
+    <div className="animate-fade-in">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-slate-900">Payroll Batch</h2>
           <button
             onClick={onOpenAddModal}
-            className="flex items-center gap-1.5 text-sm font-medium text-[#059669] hover:text-[#047857] transition-all duration-200"
+            className="flex items-center gap-1.5 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-all duration-150 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg"
           >
             <Plus className="w-4 h-4" />
             Add Employee
           </button>
         </div>
+
+        {/* Search */}
+        {batch.length > 3 && (
+          <div className="px-6 py-3 border-b border-slate-50">
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                placeholder="Search batch employees..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full max-w-sm pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-slate-50"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Table */}
         <table className="w-full">
           <thead>
-            <tr className="text-xs text-gray-500 uppercase tracking-wider">
+            <tr className="text-xs text-slate-500 uppercase tracking-wider">
               <th className="text-left px-6 py-3 font-medium">Employee</th>
               <th className="text-left px-6 py-3 font-medium">Country</th>
               <th className="text-right px-6 py-3 font-medium">Amount</th>
@@ -64,15 +91,15 @@ export function PayrollReview({
             </tr>
           </thead>
           <tbody>
-            {batch.map((emp) => (
-              <tr key={emp.id} className="border-t border-gray-50 hover:bg-gray-50 transition-all duration-200">
+            {filteredBatch.map((emp) => (
+              <tr key={emp.id} className="border-t border-slate-50 table-row-hover group">
                 <td className="px-6 py-3.5">
                   <div className="flex items-center gap-3">
                     <Avatar initials={emp.avatar} />
-                    <span className="text-sm font-medium text-gray-900">{emp.name}</span>
+                    <span className="text-sm font-medium text-slate-900">{emp.name}</span>
                   </div>
                 </td>
-                <td className="px-6 py-3.5 text-sm text-gray-600">
+                <td className="px-6 py-3.5 text-sm text-slate-600">
                   {emp.flag && <span className="mr-1.5">{emp.flag}</span>}
                   {emp.country}
                 </td>
@@ -85,12 +112,12 @@ export function PayrollReview({
                       onChange={(e) => onUpdateAmount(emp.id, parseFloat(e.target.value) || 0)}
                       onBlur={() => onSetEditingAmount(null)}
                       onKeyDown={(e) => { if (e.key === "Enter") onSetEditingAmount(null); }}
-                      className="w-28 text-right text-sm font-medium border border-[#059669] rounded-md px-2 py-1 outline-none focus:ring-2 focus:ring-[#059669]/20"
+                      className="w-28 text-right text-sm font-medium border border-emerald-500 rounded-lg px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-emerald-500/20"
                     />
                   ) : (
                     <button
                       onClick={() => onSetEditingAmount(emp.id)}
-                      className="text-sm font-medium text-gray-900 hover:text-[#059669] cursor-pointer transition-all duration-200 border-b border-dashed border-gray-300 hover:border-[#059669]"
+                      className="text-sm font-semibold text-slate-900 hover:text-emerald-600 cursor-pointer transition-all duration-150 border-b border-dashed border-slate-300 hover:border-emerald-500"
                     >
                       {formatCurrency(emp.amount)}
                     </button>
@@ -100,7 +127,7 @@ export function PayrollReview({
                   <select
                     value={emp.currency}
                     onChange={(e) => onUpdateCurrency(emp.id, e.target.value)}
-                    className="text-sm bg-gray-50 border border-gray-200 rounded-md px-2 py-1 outline-none focus:ring-2 focus:ring-[#059669]/20 cursor-pointer"
+                    className="text-sm bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer"
                   >
                     {TOKEN_LIST.map((t) => (
                       <option key={t.symbol} value={t.symbol}>{t.symbol}</option>
@@ -108,7 +135,10 @@ export function PayrollReview({
                   </select>
                 </td>
                 <td className="px-6 py-3.5 text-right">
-                  <button onClick={() => onRemove(emp.id)} className="text-gray-400 hover:text-red-500 transition-all duration-200">
+                  <button
+                    onClick={() => onRemove(emp.id)}
+                    className="text-slate-300 hover:text-red-500 transition-all duration-150 opacity-0 group-hover:opacity-100"
+                  >
                     <X className="w-4 h-4" />
                   </button>
                 </td>
@@ -119,23 +149,23 @@ export function PayrollReview({
       </div>
 
       {/* Batch Summary */}
-      <div className="mt-4 bg-white rounded-xl border border-gray-200 shadow-sm px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-6">
+      <div className="mt-4 bg-white rounded-xl border border-slate-200 shadow-sm px-6 py-5 flex items-center justify-between">
+        <div className="flex items-center gap-8">
           <div>
-            <div className="text-xs text-gray-500 uppercase tracking-wider">Total</div>
-            <div className="text-xl font-bold text-gray-900">{formatCurrency(batchTotal)}</div>
+            <div className="text-xs text-slate-500 uppercase tracking-wider font-medium">Total</div>
+            <div className="text-2xl font-bold text-slate-900 mt-0.5">{formatCurrency(batchTotal)}</div>
           </div>
-          <div className="h-8 w-px bg-gray-200" />
+          <div className="h-10 w-px bg-slate-200" />
           <div>
-            <div className="text-xs text-gray-500 uppercase tracking-wider">Employees</div>
-            <div className="text-xl font-bold text-gray-900">{batch.length}</div>
+            <div className="text-xs text-slate-500 uppercase tracking-wider font-medium">Employees</div>
+            <div className="text-2xl font-bold text-slate-900 mt-0.5">{batch.length}</div>
           </div>
-          <div className="h-8 w-px bg-gray-200" />
+          <div className="h-10 w-px bg-slate-200" />
           <div>
-            <div className="text-xs text-gray-500 uppercase tracking-wider">By Currency</div>
-            <div className="flex items-center gap-2 mt-0.5">
+            <div className="text-xs text-slate-500 uppercase tracking-wider font-medium">By Currency</div>
+            <div className="flex items-center gap-2 mt-1.5">
               {Object.entries(currencyBreakdown).map(([cur, amt]) => (
-                <span key={cur} className="text-xs font-medium bg-gray-100 px-2 py-0.5 rounded">
+                <span key={cur} className="text-xs font-medium bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md">
                   {formatCurrencyShort(amt)} {cur}
                 </span>
               ))}
@@ -145,7 +175,7 @@ export function PayrollReview({
         <button
           onClick={onContinue}
           disabled={batch.length === 0}
-          className="bg-[#059669] hover:bg-[#047857] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold px-6 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-2"
+          className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-semibold px-6 py-2.5 rounded-xl transition-all duration-200 flex items-center gap-2 shadow-sm"
         >
           Continue
           <ArrowRight className="w-4 h-4" />

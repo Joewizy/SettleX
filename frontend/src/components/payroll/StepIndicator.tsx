@@ -15,10 +15,10 @@ export function StepIndicator({ currentStep }: { currentStep: PayrollStep }) {
       {STEPS.map((step, idx) => (
         <div key={step.num} className="flex items-center gap-2">
           <div
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
               currentStep >= step.num
-                ? "bg-[#059669] text-white"
-                : "bg-gray-100 text-gray-400"
+                ? "bg-emerald-600 text-white shadow-sm"
+                : "bg-slate-100 text-slate-400"
             }`}
           >
             <span
@@ -30,7 +30,7 @@ export function StepIndicator({ currentStep }: { currentStep: PayrollStep }) {
             </span>
             {step.label}
           </div>
-          {idx < 2 && <ChevronRight className="w-4 h-4 text-gray-300" />}
+          {idx < 2 && <ChevronRight className="w-4 h-4 text-slate-300" />}
         </div>
       ))}
     </div>

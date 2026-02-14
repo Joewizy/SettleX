@@ -30,7 +30,7 @@ export function AddToBatchModal({ employees, batchIds, onAdd, onClose }: AddToBa
       name,
       email: "",
       country: "",
-      flag: "🌍",
+      flag: "",
       currency,
       amount: parseFloat(amount),
       wallet: "",
@@ -40,19 +40,19 @@ export function AddToBatchModal({ employees, batchIds, onAdd, onClose }: AddToBa
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-xl w-[480px] p-6" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-xl w-[480px] p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-lg font-semibold text-gray-900">Add to Batch</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-all duration-200">
+          <h3 className="text-lg font-semibold text-slate-900">Add to Batch</h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-all duration-150 p-1 rounded-lg hover:bg-slate-100">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {available.length > 0 && (
           <div className="mb-5">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Add Existing Employee</label>
-            <div className="space-y-2 max-h-40 overflow-y-auto">
+            <label className="block text-sm font-medium text-slate-700 mb-2">Add Existing Employee</label>
+            <div className="space-y-1.5 max-h-40 overflow-y-auto">
               {available.map((emp) => (
                 <button
                   key={emp.id}
@@ -63,25 +63,25 @@ export function AddToBatchModal({ employees, batchIds, onAdd, onClose }: AddToBa
                     });
                     onClose();
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg border border-gray-200 hover:border-[#059669] hover:bg-green-50/50 transition-all duration-200"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/50 transition-all duration-150"
                 >
                   <Avatar initials={emp.avatar} size="sm" />
-                  <span className="text-sm font-medium">{emp.name}</span>
-                  <span className="text-xs text-gray-400 ml-auto">{emp.currency}</span>
+                  <span className="text-sm font-medium text-slate-900">{emp.name}</span>
+                  <span className="text-xs text-slate-400 ml-auto bg-slate-50 px-2 py-0.5 rounded">{emp.currency}</span>
                 </button>
               ))}
             </div>
           </div>
         )}
 
-        <div className="border-t border-gray-100 pt-5">
-          <label className="block text-sm font-medium text-gray-700 mb-3">Or Add One-Time Payment</label>
+        <div className="border-t border-slate-100 pt-5">
+          <label className="block text-sm font-medium text-slate-700 mb-3">Or Add One-Time Payment</label>
           <div className="space-y-3">
             <input
               placeholder="Recipient Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#059669]/20 focus:border-[#059669]"
+              className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
             />
             <div className="flex gap-3">
               <input
@@ -89,12 +89,12 @@ export function AddToBatchModal({ employees, batchIds, onAdd, onClose }: AddToBa
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#059669]/20 focus:border-[#059669]"
+                className="flex-1 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
               />
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[#059669]/20 focus:border-[#059669]"
+                className="border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
               >
                 {TOKEN_LIST.map((t) => (
                   <option key={t.symbol} value={t.symbol}>{t.symbol}</option>
@@ -104,7 +104,7 @@ export function AddToBatchModal({ employees, batchIds, onAdd, onClose }: AddToBa
             <button
               onClick={handleAddOneTime}
               disabled={!name || !amount}
-              className="w-full bg-[#059669] hover:bg-[#047857] disabled:bg-gray-300 text-white font-semibold py-2.5 rounded-lg transition-all duration-200"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-semibold py-2.5 rounded-xl transition-all duration-150 shadow-sm"
             >
               Add to Batch
             </button>
