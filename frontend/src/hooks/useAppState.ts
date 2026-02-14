@@ -83,6 +83,10 @@ export function useTeam() {
     setEmployees((prev) => prev.filter((e) => e.id !== id));
   }, []);
 
+  const addEmployeesBulk = useCallback((newEmps: Employee[]) => {
+    setEmployees((prev) => [...prev, ...newEmps]);
+  }, []);
+
   return {
     employees,
     activeEmployees,
@@ -95,6 +99,7 @@ export function useTeam() {
     setNewEmployee,
     addEmployee,
     deleteEmployee,
+    addEmployeesBulk,
   };
 }
 

@@ -127,6 +127,7 @@ export default function SettleXApp() {
               onSetNewEmployee={team.setNewEmployee}
               onAddEmployee={team.addEmployee}
               onDeleteEmployee={team.deleteEmployee}
+              onAddEmployeesBulk={team.addEmployeesBulk}
             />
           )}
           {nav.currentPage === "history" && (

@@ -5,7 +5,8 @@
       "Bash(npm install:*)",
       "Bash(du:*)",
       "Bash(find:*)",
-      "Bash(npm ls:*)"
+      "Bash(npm ls:*)",
+      "Bash(lsof:*)"
     ]
   }
 }

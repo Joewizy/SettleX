@@ -1,8 +1,10 @@
 "use client";
 
-import { Search, Plus, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Search, Plus, Pencil, Trash2, Upload } from "lucide-react";
 import { Avatar, StatusBadge } from "@/components/ui";
 import { AddEmployeeModal } from "./AddEmployeeModal";
+import { CsvUploadModal } from "./CsvUploadModal";
 import type { Employee, NewEmployeeForm } from "@/lib/types";
 
 interface TeamPageProps {
@@ -15,6 +17,7 @@ interface TeamPageProps {
   onSetNewEmployee: (form: NewEmployeeForm) => void;
   onAddEmployee: () => void;
   onDeleteEmployee: (id: number) => void;
+  onAddEmployeesBulk: (employees: Employee[]) => void;
 }
 
 export function TeamPage({
@@ -27,7 +30,10 @@ export function TeamPage({
   onSetNewEmployee,
   onAddEmployee,
   onDeleteEmployee,
+  onAddEmployeesBulk,
 }: TeamPageProps) {
+  const [showCsvUpload, setShowCsvUpload] = useState(false);
+
   return (
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-6">
@@ -47,6 +53,12 @@ export function TeamPage({
               className="pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 w-64 bg-white"
             />
           </div>
+          <button
+            onClick={() => setShowCsvUpload(true)}
+            className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium px-4 py-2 rounded-lg transition-all duration-150 flex items-center gap-2 text-sm"
+          >
+            <Upload className="w-4 h-4" /> Import CSV
+          </button>
           <button
             onClick={() => {
               onSetNewEmployee({ name: "", email: "", country: "", wallet: "", currency: "pathUSD" });
@@ -122,6 +134,13 @@ export function TeamPage({
           onChange={onSetNewEmployee}
           onSave={onAddEmployee}
           onClose={() => onSetShowAddEmployee(false)}
+        />
+      )}
+
+      {showCsvUpload && (
+        <CsvUploadModal
+          onImport={onAddEmployeesBulk}
+          onClose={() => setShowCsvUpload(false)}
         />
       )}
     </div>

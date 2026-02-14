@@ -303,7 +303,10 @@ export function Dashboard({ employeeCount, onNavigate, onExpandHistory, employer
                   Schedule Payment
                 </span>
               </button>
-              <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-50 transition-all duration-150 text-left group">
+              <button
+                onClick={() => onNavigate("team")}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-50 transition-all duration-150 text-left group"
+              >
                 <Upload className="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" />
                 <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">
                   Bulk Upload

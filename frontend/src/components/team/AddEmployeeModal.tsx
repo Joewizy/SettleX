@@ -13,7 +13,7 @@ interface AddEmployeeModalProps {
 
 export function AddEmployeeModal({ form, onChange, onSave, onClose }: AddEmployeeModalProps) {
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[60] animate-fade-in" onClick={onClose}>
       <div className="bg-white rounded-2xl shadow-xl w-[480px] p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-lg font-semibold text-slate-900">Add Employee</h3>

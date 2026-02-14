@@ -65,7 +65,10 @@ export function Sidebar({
             <Download className="w-4 h-4" />
             Export
           </button>
-          <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-lg transition-all duration-150">
+          <button
+            onClick={() => onNavigate("team")}
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-lg transition-all duration-150"
+          >
             <Upload className="w-4 h-4" />
             Upload CSV
           </button>
