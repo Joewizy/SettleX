@@ -76,6 +76,15 @@ export interface SettlementTxData {
   settlementTime: string;
 }
 
+// ─── Templates ──────────────────────────────────────────────────────────────
+
+export interface PayrollTemplate {
+  id: string;
+  name: string;
+  createdAt: string;
+  employees: BatchEmployee[];
+}
+
 // ─── Token ───────────────────────────────────────────────────────────────────
 
 export interface TokenInfo {

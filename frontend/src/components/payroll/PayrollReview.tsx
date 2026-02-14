@@ -1,12 +1,12 @@
 "use client";
 
-import { Plus, ArrowRight, X, Search } from "lucide-react";
+import { Plus, ArrowRight, X, Search, Save, FolderOpen, Trash2, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Avatar } from "@/components/ui";
 import { AddToBatchModal } from "./AddToBatchModal";
 import { TOKEN_LIST } from "@/lib/constants";
 import { formatCurrency, formatCurrencyShort } from "@/lib/utils";
-import type { BatchEmployee, Employee } from "@/lib/types";
+import type { BatchEmployee, Employee, PayrollTemplate } from "@/lib/types";
 
 interface PayrollReviewProps {
   batch: BatchEmployee[];
@@ -23,6 +23,10 @@ interface PayrollReviewProps {
   onOpenAddModal: () => void;
   onCloseAddModal: () => void;
   onContinue: () => void;
+  templates: PayrollTemplate[];
+  onSaveTemplate: (name: string, employees: BatchEmployee[]) => void;
+  onLoadTemplate: (employees: BatchEmployee[]) => void;
+  onDeleteTemplate: (id: string) => void;
 }
 
 export function PayrollReview({
@@ -40,8 +44,15 @@ export function PayrollReview({
   onOpenAddModal,
   onCloseAddModal,
   onContinue,
+  templates,
+  onSaveTemplate,
+  onLoadTemplate,
+  onDeleteTemplate,
 }: PayrollReviewProps) {
   const [search, setSearch] = useState("");
+  const [showSaveTemplate, setShowSaveTemplate] = useState(false);
+  const [templateName, setTemplateName] = useState("");
+  const [showLoadTemplate, setShowLoadTemplate] = useState(false);
 
   const filteredBatch = batch.filter(
     (emp) =>
@@ -55,14 +66,108 @@ export function PayrollReview({
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
           <h2 className="text-base font-semibold text-slate-900">Payroll Batch</h2>
-          <button
-            onClick={onOpenAddModal}
-            className="flex items-center gap-1.5 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-all duration-150 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg"
-          >
-            <Plus className="w-4 h-4" />
-            Add Employee
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Load Template */}
+            <div className="relative">
+              <button
+                onClick={() => setShowLoadTemplate(!showLoadTemplate)}
+                className="flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-800 transition-all duration-150 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg"
+              >
+                <FolderOpen className="w-4 h-4" />
+                Templates
+                <ChevronDown className="w-3.5 h-3.5" />
+              </button>
+              {showLoadTemplate && (
+                <div className="absolute right-0 top-full mt-1 w-72 bg-white rounded-xl border border-slate-200 shadow-lg z-20">
+                  <div className="px-4 py-3 border-b border-slate-100">
+                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">Saved Templates</p>
+                  </div>
+                  {templates.length === 0 ? (
+                    <div className="px-4 py-6 text-center">
+                      <p className="text-sm text-slate-400">No saved templates</p>
+                      <p className="text-xs text-slate-300 mt-1">Save your current batch as a template to reuse later</p>
+                    </div>
+                  ) : (
+                    <div className="max-h-60 overflow-y-auto">
+                      {templates.map((t) => (
+                        <div key={t.id} className="px-4 py-3 hover:bg-slate-50 flex items-center justify-between border-b border-slate-50 last:border-0">
+                          <button
+                            onClick={() => { onLoadTemplate(t.employees); setShowLoadTemplate(false); }}
+                            className="text-left flex-1 min-w-0"
+                          >
+                            <p className="text-sm font-medium text-slate-900 truncate">{t.name}</p>
+                            <p className="text-xs text-slate-400">{t.employees.length} employees &middot; {t.createdAt}</p>
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); onDeleteTemplate(t.id); }}
+                            className="text-slate-300 hover:text-red-500 ml-2 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Save as Template */}
+            <button
+              onClick={() => { setShowSaveTemplate(true); setTemplateName(""); }}
+              disabled={batch.length === 0}
+              className="flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-800 disabled:text-slate-300 transition-all duration-150 bg-slate-50 hover:bg-slate-100 disabled:hover:bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg"
+            >
+              <Save className="w-4 h-4" />
+              Save
+            </button>
+
+            <button
+              onClick={onOpenAddModal}
+              className="flex items-center gap-1.5 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-all duration-150 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg"
+            >
+              <Plus className="w-4 h-4" />
+              Add Employee
+            </button>
+          </div>
         </div>
+
+        {/* Save Template Inline */}
+        {showSaveTemplate && (
+          <div className="px-6 py-3 border-b border-slate-100 bg-emerald-50/50 flex items-center gap-3">
+            <input
+              autoFocus
+              placeholder="Template name (e.g. Monthly Payroll)"
+              value={templateName}
+              onChange={(e) => setTemplateName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && templateName.trim()) {
+                  onSaveTemplate(templateName.trim(), batch);
+                  setShowSaveTemplate(false);
+                }
+              }}
+              className="flex-1 max-w-sm text-sm border border-emerald-200 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white"
+            />
+            <button
+              onClick={() => {
+                if (templateName.trim()) {
+                  onSaveTemplate(templateName.trim(), batch);
+                  setShowSaveTemplate(false);
+                }
+              }}
+              disabled={!templateName.trim()}
+              className="text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 px-4 py-2 rounded-lg transition-colors"
+            >
+              Save Template
+            </button>
+            <button
+              onClick={() => setShowSaveTemplate(false)}
+              className="text-slate-400 hover:text-slate-600"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
         {/* Search */}
         {batch.length > 3 && (

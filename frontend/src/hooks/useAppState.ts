@@ -9,6 +9,7 @@ import type {
   HistoryFilter,
   NewEmployeeForm,
   PayrollRecord,
+  PayrollTemplate,
 } from "@/lib/types";
 import { EMPLOYEES_SEED } from "@/lib/constants";
 import { getInitials } from "@/lib/utils";
@@ -164,6 +165,15 @@ export function usePayroll(activeEmployees: Employee[]) {
     setPayrollBatch((prev) => [...prev, emp]);
   }, []);
 
+  const loadBatchFromTemplate = useCallback((employees: BatchEmployee[]) => {
+    setPayrollBatch(employees);
+    setPayrollStep(1);
+    setSettlementStatus({});
+    setSettlementComplete(false);
+    setSettlementTxData(null);
+    setSettlementError(null);
+  }, []);
+
   // Real blockchain settlement via the SettleX contract
   const startSettlement = useCallback(
     async (
@@ -266,6 +276,7 @@ export function usePayroll(activeEmployees: Employee[]) {
     updateAmount,
     updateCurrency,
     addToBatch,
+    loadBatchFromTemplate,
     startSettlement,
   };
 }
@@ -342,4 +353,59 @@ export function usePayrollHistory() {
   );
 
   return { records, addRecord };
+}
+
+// Persisted payroll templates (saved to localStorage)
+const TEMPLATES_STORAGE_KEY = "settlex_payroll_templates";
+
+function loadTemplates(): PayrollTemplate[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(TEMPLATES_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveTemplates(templates: PayrollTemplate[]) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(TEMPLATES_STORAGE_KEY, JSON.stringify(templates));
+}
+
+export function usePayrollTemplates() {
+  const [templates, setTemplates] = useState<PayrollTemplate[]>([]);
+
+  useEffect(() => {
+    setTemplates(loadTemplates());
+  }, []);
+
+  const saveTemplate = useCallback((name: string, employees: BatchEmployee[]) => {
+    const template: PayrollTemplate = {
+      id: `TPL-${Date.now()}`,
+      name,
+      createdAt: new Date().toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
+      employees,
+    };
+
+    setTemplates((prev) => {
+      const updated = [template, ...prev];
+      saveTemplates(updated);
+      return updated;
+    });
+  }, []);
+
+  const deleteTemplate = useCallback((id: string) => {
+    setTemplates((prev) => {
+      const updated = prev.filter((t) => t.id !== id);
+      saveTemplates(updated);
+      return updated;
+    });
+  }, []);
+
+  return { templates, saveTemplate, deleteTemplate };
 }

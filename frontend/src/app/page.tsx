@@ -15,6 +15,7 @@ import {
   useHistory,
   useBatch,
   usePayrollHistory,
+  usePayrollTemplates,
 } from "@/hooks/useAppState";
 import { useToken } from "@/hooks/useToken";
 import { usePayment } from "@/hooks/usePayment";
@@ -31,6 +32,7 @@ export default function SettleXApp() {
   const payment = usePayment();
   const settleX = useSettleX();
   const payrollHistory = usePayrollHistory();
+  const payrollTemplates = usePayrollTemplates();
 
   const [payrollToken] = useState(DEFAULT_TOKEN);
   const token = useToken(payrollToken.address);
@@ -114,6 +116,10 @@ export default function SettleXApp() {
               onResetPayroll={payroll.resetPayroll}
               onNavigate={handleNavigate}
               onToggleAutoSwap={payroll.setAutoSwapEnabled}
+              templates={payrollTemplates.templates}
+              onSaveTemplate={payrollTemplates.saveTemplate}
+              onLoadTemplate={payroll.loadBatchFromTemplate}
+              onDeleteTemplate={payrollTemplates.deleteTemplate}
             />
           )}
           {nav.currentPage === "team" && (

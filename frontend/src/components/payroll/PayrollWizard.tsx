@@ -4,7 +4,7 @@ import { StepIndicator } from "./StepIndicator";
 import { PayrollReview } from "./PayrollReview";
 import { PayrollConfirm } from "./PayrollConfirm";
 import { PayrollSettlement } from "./PayrollSettlement";
-import type { PayrollStep, BatchEmployee, Employee, SettlementState, SettlementTxData, Page } from "@/lib/types";
+import type { PayrollStep, BatchEmployee, Employee, SettlementState, SettlementTxData, Page, PayrollTemplate } from "@/lib/types";
 
 interface PayrollWizardProps {
   step: PayrollStep;
@@ -37,6 +37,10 @@ interface PayrollWizardProps {
   onResetPayroll: () => void;
   onNavigate: (page: Page) => void;
   onToggleAutoSwap: (enabled: boolean) => void;
+  templates: PayrollTemplate[];
+  onSaveTemplate: (name: string, employees: BatchEmployee[]) => void;
+  onLoadTemplate: (employees: BatchEmployee[]) => void;
+  onDeleteTemplate: (id: string) => void;
 }
 
 export function PayrollWizard({
@@ -70,6 +74,10 @@ export function PayrollWizard({
   onResetPayroll,
   onNavigate,
   onToggleAutoSwap,
+  templates,
+  onSaveTemplate,
+  onLoadTemplate,
+  onDeleteTemplate,
 }: PayrollWizardProps) {
   return (
     <div>
@@ -97,6 +105,10 @@ export function PayrollWizard({
           onOpenAddModal={onOpenAddModal}
           onCloseAddModal={onCloseAddModal}
           onContinue={() => onSetStep(2)}
+          templates={templates}
+          onSaveTemplate={onSaveTemplate}
+          onLoadTemplate={onLoadTemplate}
+          onDeleteTemplate={onDeleteTemplate}
         />
       )}
 
