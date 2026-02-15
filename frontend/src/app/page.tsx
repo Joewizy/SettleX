@@ -76,7 +76,7 @@ export default function SettleXApp() {
         onToggleUserMenu={() => nav.setShowUserMenu(!nav.showUserMenu)}
       />
       <main className="pt-16">
-        <div className="max-w-[1400px] mx-auto px-6 py-8">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
           {nav.currentPage === "dashboard" && (
             <Dashboard
               employeeCount={team.employees.length}

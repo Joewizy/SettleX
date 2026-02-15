@@ -53,7 +53,7 @@ export function Dashboard({ employeeCount, onNavigate, onExpandHistory, employer
       </div>
 
       {/* Stat Cards — on-chain data */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
         <StatCard
           icon={DollarSign}
           label="Total Paid"
@@ -113,7 +113,7 @@ export function Dashboard({ employeeCount, onNavigate, onExpandHistory, employer
       </div>
 
       {/* Main Content: Payroll Table + Sidebar */}
-      <div className="grid grid-cols-[1fr_340px] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
         {/* Left: Upcoming Payroll */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
@@ -143,52 +143,54 @@ export function Dashboard({ employeeCount, onNavigate, onExpandHistory, employer
           </div>
 
           {/* Table Header */}
-          <table className="w-full">
-            <thead>
-              <tr className="text-xs text-slate-500 uppercase tracking-wider">
-                <th className="text-left px-6 py-3 font-medium">Employee</th>
-                <th className="text-left px-6 py-3 font-medium">Wallet</th>
-                <th className="text-right px-6 py-3 font-medium">Amount</th>
-                <th className="text-center px-6 py-3 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredEmployees.map((emp) => (
-                <tr
-                  key={emp.id}
-                  className="border-t border-slate-50 table-row-hover transition-all duration-150"
-                >
-                  <td className="px-6 py-3.5">
-                    <div className="flex items-center gap-3">
-                      <Avatar initials={emp.avatar} />
-                      <div>
-                        <div className="text-sm font-medium text-slate-900">{emp.name}</div>
-                        <div className="text-xs text-slate-400 flex items-center gap-1">
-                          <span>{emp.flag}</span> {emp.country}
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[500px]">
+              <thead>
+                <tr className="text-xs text-slate-500 uppercase tracking-wider">
+                  <th className="text-left px-4 sm:px-6 py-3 font-medium">Employee</th>
+                  <th className="text-left px-4 sm:px-6 py-3 font-medium hidden sm:table-cell">Wallet</th>
+                  <th className="text-right px-4 sm:px-6 py-3 font-medium">Amount</th>
+                  <th className="text-center px-4 sm:px-6 py-3 font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredEmployees.map((emp) => (
+                  <tr
+                    key={emp.id}
+                    className="border-t border-slate-50 table-row-hover transition-all duration-150"
+                  >
+                    <td className="px-4 sm:px-6 py-3.5">
+                      <div className="flex items-center gap-3">
+                        <Avatar initials={emp.avatar} />
+                        <div>
+                          <div className="text-sm font-medium text-slate-900">{emp.name}</div>
+                          <div className="text-xs text-slate-400 flex items-center gap-1">
+                            <span>{emp.flag}</span> {emp.country}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3.5">
-                    <span className="font-mono text-xs text-slate-500">
-                      {truncateAddress(emp.wallet)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-3.5 text-right">
-                    <div className="text-sm font-semibold text-slate-900">
-                      {formatCurrency(emp.amount)}
-                    </div>
-                    <div className="text-xs text-slate-400">{emp.currency}</div>
-                  </td>
-                  <td className="px-6 py-3.5 text-center">
-                    <button className="text-slate-400 hover:text-slate-600 transition-all duration-150">
-                      <Eye className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    </td>
+                    <td className="px-4 sm:px-6 py-3.5 hidden sm:table-cell">
+                      <span className="font-mono text-xs text-slate-500">
+                        {truncateAddress(emp.wallet)}
+                      </span>
+                    </td>
+                    <td className="px-4 sm:px-6 py-3.5 text-right">
+                      <div className="text-sm font-semibold text-slate-900">
+                        {formatCurrency(emp.amount)}
+                      </div>
+                      <div className="text-xs text-slate-400">{emp.currency}</div>
+                    </td>
+                    <td className="px-4 sm:px-6 py-3.5 text-center">
+                      <button className="text-slate-400 hover:text-slate-600 transition-all duration-150">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           {/* Summary Footer */}
           <div className="px-6 py-4 border-t border-slate-100 space-y-2">
@@ -215,7 +217,7 @@ export function Dashboard({ employeeCount, onNavigate, onExpandHistory, employer
               onClick={() => onNavigate("payroll")}
               className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3.5 rounded-xl transition-all duration-200 text-base shadow-sm flex items-center justify-center gap-2"
             >
-              Execute Batch Payment ({employeeCount} employees)
+              Execute Batch Payment ({employeeCount})
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

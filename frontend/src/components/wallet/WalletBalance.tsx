@@ -41,14 +41,14 @@ export function WalletBalance() {
     <div className="relative">
       <button
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-4 py-2 shadow-sm hover:bg-slate-50 transition-all duration-150"
+        className="flex items-center gap-1.5 sm:gap-2 bg-white border border-slate-200 rounded-lg px-2.5 sm:px-4 py-2 shadow-sm hover:bg-slate-50 transition-all duration-150"
       >
         <Wallet className="w-4 h-4 text-slate-500" />
-        <span className="text-sm text-slate-500">Balance:</span>
-        <span className="text-sm font-bold text-slate-900">
+        <span className="text-sm text-slate-500 hidden sm:inline">Balance:</span>
+        <span className="text-xs sm:text-sm font-bold text-slate-900">
           ${formattedBalance}
         </span>
-        <span className="text-xs text-slate-400 font-medium">
+        <span className="text-xs text-slate-400 font-medium hidden sm:inline">
           {selectedToken.symbol}
         </span>
         <ChevronDown className="w-3.5 h-3.5 text-slate-400" />

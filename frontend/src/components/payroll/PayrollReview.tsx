@@ -64,9 +64,9 @@ export function PayrollReview({
     <div className="animate-fade-in">
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div className="px-4 sm:px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <h2 className="text-base font-semibold text-slate-900">Payroll Batch</h2>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {/* Load Template */}
             <div className="relative">
               <button
@@ -134,7 +134,7 @@ export function PayrollReview({
 
         {/* Save Template Inline */}
         {showSaveTemplate && (
-          <div className="px-6 py-3 border-b border-slate-100 bg-emerald-50/50 flex items-center gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-slate-100 bg-emerald-50/50 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <input
               autoFocus
               placeholder="Template name (e.g. Monthly Payroll)"
@@ -146,7 +146,7 @@ export function PayrollReview({
                   setShowSaveTemplate(false);
                 }
               }}
-              className="flex-1 max-w-sm text-sm border border-emerald-200 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white"
+              className="flex-1 sm:max-w-sm text-sm border border-emerald-200 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white"
             />
             <button
               onClick={() => {
@@ -171,104 +171,106 @@ export function PayrollReview({
 
         {/* Search */}
         {batch.length > 3 && (
-          <div className="px-6 py-3 border-b border-slate-50">
+          <div className="px-4 sm:px-6 py-3 border-b border-slate-50">
             <div className="relative">
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 placeholder="Search batch employees..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full max-w-sm pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-slate-50"
+                className="w-full sm:max-w-sm pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-slate-50"
               />
             </div>
           </div>
         )}
 
         {/* Table */}
-        <table className="w-full">
-          <thead>
-            <tr className="text-xs text-slate-500 uppercase tracking-wider">
-              <th className="text-left px-6 py-3 font-medium">Employee</th>
-              <th className="text-left px-6 py-3 font-medium">Country</th>
-              <th className="text-right px-6 py-3 font-medium">Amount</th>
-              <th className="text-left px-6 py-3 font-medium pl-8">Currency</th>
-              <th className="text-right px-6 py-3 font-medium">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredBatch.map((emp) => (
-              <tr key={emp.id} className="border-t border-slate-50 table-row-hover group">
-                <td className="px-6 py-3.5">
-                  <div className="flex items-center gap-3">
-                    <Avatar initials={emp.avatar} />
-                    <span className="text-sm font-medium text-slate-900">{emp.name}</span>
-                  </div>
-                </td>
-                <td className="px-6 py-3.5 text-sm text-slate-600">
-                  {emp.flag && <span className="mr-1.5">{emp.flag}</span>}
-                  {emp.country}
-                </td>
-                <td className="px-6 py-3.5 text-right">
-                  {editingAmount === emp.id ? (
-                    <input
-                      type="number"
-                      autoFocus
-                      value={emp.amount}
-                      onChange={(e) => onUpdateAmount(emp.id, parseFloat(e.target.value) || 0)}
-                      onBlur={() => onSetEditingAmount(null)}
-                      onKeyDown={(e) => { if (e.key === "Enter") onSetEditingAmount(null); }}
-                      className="w-28 text-right text-sm font-medium border border-emerald-500 rounded-lg px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-emerald-500/20"
-                    />
-                  ) : (
-                    <button
-                      onClick={() => onSetEditingAmount(emp.id)}
-                      className="text-sm font-semibold text-slate-900 hover:text-emerald-600 cursor-pointer transition-all duration-150 border-b border-dashed border-slate-300 hover:border-emerald-500"
-                    >
-                      {formatCurrency(emp.amount)}
-                    </button>
-                  )}
-                </td>
-                <td className="px-6 py-3.5 pl-8">
-                  <select
-                    value={emp.currency}
-                    onChange={(e) => onUpdateCurrency(emp.id, e.target.value)}
-                    className="text-sm bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer"
-                  >
-                    {TOKEN_LIST.map((t) => (
-                      <option key={t.symbol} value={t.symbol}>{t.symbol}</option>
-                    ))}
-                  </select>
-                </td>
-                <td className="px-6 py-3.5 text-right">
-                  <button
-                    onClick={() => onRemove(emp.id)}
-                    className="text-slate-300 hover:text-red-500 transition-all duration-150 opacity-0 group-hover:opacity-100"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[500px]">
+            <thead>
+              <tr className="text-xs text-slate-500 uppercase tracking-wider">
+                <th className="text-left px-4 sm:px-6 py-3 font-medium">Employee</th>
+                <th className="text-left px-4 sm:px-6 py-3 font-medium hidden sm:table-cell">Country</th>
+                <th className="text-right px-4 sm:px-6 py-3 font-medium">Amount</th>
+                <th className="text-left px-4 sm:px-6 py-3 font-medium pl-4 sm:pl-8">Currency</th>
+                <th className="text-right px-4 sm:px-6 py-3 font-medium">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredBatch.map((emp) => (
+                <tr key={emp.id} className="border-t border-slate-50 table-row-hover group">
+                  <td className="px-4 sm:px-6 py-3.5">
+                    <div className="flex items-center gap-3">
+                      <Avatar initials={emp.avatar} />
+                      <span className="text-sm font-medium text-slate-900">{emp.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 sm:px-6 py-3.5 text-sm text-slate-600 hidden sm:table-cell">
+                    {emp.flag && <span className="mr-1.5">{emp.flag}</span>}
+                    {emp.country}
+                  </td>
+                  <td className="px-4 sm:px-6 py-3.5 text-right">
+                    {editingAmount === emp.id ? (
+                      <input
+                        type="number"
+                        autoFocus
+                        value={emp.amount}
+                        onChange={(e) => onUpdateAmount(emp.id, parseFloat(e.target.value) || 0)}
+                        onBlur={() => onSetEditingAmount(null)}
+                        onKeyDown={(e) => { if (e.key === "Enter") onSetEditingAmount(null); }}
+                        className="w-24 sm:w-28 text-right text-sm font-medium border border-emerald-500 rounded-lg px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-emerald-500/20"
+                      />
+                    ) : (
+                      <button
+                        onClick={() => onSetEditingAmount(emp.id)}
+                        className="text-sm font-semibold text-slate-900 hover:text-emerald-600 cursor-pointer transition-all duration-150 border-b border-dashed border-slate-300 hover:border-emerald-500"
+                      >
+                        {formatCurrency(emp.amount)}
+                      </button>
+                    )}
+                  </td>
+                  <td className="px-4 sm:px-6 py-3.5 pl-4 sm:pl-8">
+                    <select
+                      value={emp.currency}
+                      onChange={(e) => onUpdateCurrency(emp.id, e.target.value)}
+                      className="text-sm bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer"
+                    >
+                      {TOKEN_LIST.map((t) => (
+                        <option key={t.symbol} value={t.symbol}>{t.symbol}</option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="px-4 sm:px-6 py-3.5 text-right">
+                    <button
+                      onClick={() => onRemove(emp.id)}
+                      className="text-slate-300 hover:text-red-500 transition-all duration-150 sm:opacity-0 sm:group-hover:opacity-100"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Batch Summary */}
-      <div className="mt-4 bg-white rounded-xl border border-slate-200 shadow-sm px-6 py-5 flex items-center justify-between">
-        <div className="flex items-center gap-8">
+      <div className="mt-4 bg-white rounded-xl border border-slate-200 shadow-sm px-4 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-4 sm:gap-8">
           <div>
             <div className="text-xs text-slate-500 uppercase tracking-wider font-medium">Total</div>
-            <div className="text-2xl font-bold text-slate-900 mt-0.5">{formatCurrency(batchTotal)}</div>
+            <div className="text-xl sm:text-2xl font-bold text-slate-900 mt-0.5">{formatCurrency(batchTotal)}</div>
           </div>
-          <div className="h-10 w-px bg-slate-200" />
+          <div className="h-10 w-px bg-slate-200 hidden sm:block" />
           <div>
             <div className="text-xs text-slate-500 uppercase tracking-wider font-medium">Employees</div>
-            <div className="text-2xl font-bold text-slate-900 mt-0.5">{batch.length}</div>
+            <div className="text-xl sm:text-2xl font-bold text-slate-900 mt-0.5">{batch.length}</div>
           </div>
-          <div className="h-10 w-px bg-slate-200" />
+          <div className="h-10 w-px bg-slate-200 hidden sm:block" />
           <div>
             <div className="text-xs text-slate-500 uppercase tracking-wider font-medium">By Currency</div>
-            <div className="flex items-center gap-2 mt-1.5">
+            <div className="flex flex-wrap items-center gap-2 mt-1.5">
               {Object.entries(currencyBreakdown).map(([cur, amt]) => (
                 <span key={cur} className="text-xs font-medium bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md">
                   {formatCurrencyShort(amt)} {cur}
@@ -280,7 +282,7 @@ export function PayrollReview({
         <button
           onClick={onContinue}
           disabled={batch.length === 0}
-          className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-semibold px-6 py-2.5 rounded-xl transition-all duration-200 flex items-center gap-2 shadow-sm"
+          className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-semibold px-6 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
         >
           Continue
           <ArrowRight className="w-4 h-4" />

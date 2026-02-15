@@ -7,9 +7,9 @@ const rows = [
 
 export function ComparisonSection() {
   return (
-    <section className="relative py-32 px-6">
+    <section className="relative py-16 sm:py-32 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-bold text-center mb-16">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-10 sm:mb-16">
           Traditional Banking vs SettleX
         </h2>
 
@@ -45,7 +45,7 @@ export function ComparisonSection() {
         </div>
 
         <div className="mt-8 text-center">
-          <p className="text-2xl font-bold text-emerald-400">
+          <p className="text-lg sm:text-2xl font-bold text-emerald-400">
             Annual Savings: $6K-12K + 60 hours of employee waiting time
           </p>
         </div>

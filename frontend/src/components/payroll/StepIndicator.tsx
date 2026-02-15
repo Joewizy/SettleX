@@ -11,11 +11,11 @@ const STEPS = [
 
 export function StepIndicator({ currentStep }: { currentStep: PayrollStep }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1 sm:gap-2">
       {STEPS.map((step, idx) => (
-        <div key={step.num} className="flex items-center gap-2">
+        <div key={step.num} className="flex items-center gap-1 sm:gap-2">
           <div
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 ${
               currentStep >= step.num
                 ? "bg-emerald-600 text-white shadow-sm"
                 : "bg-slate-100 text-slate-400"
@@ -28,7 +28,7 @@ export function StepIndicator({ currentStep }: { currentStep: PayrollStep }) {
             >
               {currentStep > step.num ? <Check className="w-3 h-3" /> : step.num}
             </span>
-            {step.label}
+            <span className="hidden sm:inline">{step.label}</span>
           </div>
           {idx < 2 && <ChevronRight className="w-4 h-4 text-slate-300" />}
         </div>

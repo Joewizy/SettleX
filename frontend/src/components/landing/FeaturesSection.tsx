@@ -29,22 +29,22 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section id="features" className="relative py-32 px-6">
+    <section id="features" className="relative py-16 sm:py-32 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-6 sm:gap-8">
           {features.map((f) => (
             <div key={f.title} className="group relative">
               <div
                 className={`absolute inset-0 bg-gradient-to-br ${f.glow} to-transparent rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500`}
               />
-              <div className="relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
+              <div className="relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 sm:p-8 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
                 <div
-                  className={`w-14 h-14 bg-gradient-to-br ${f.gradient} rounded-xl flex items-center justify-center mb-6`}
+                  className={`w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br ${f.gradient} rounded-xl flex items-center justify-center mb-4 sm:mb-6`}
                 >
-                  <f.icon className="w-7 h-7 text-white" />
+                  <f.icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold mb-4">{f.title}</h3>
-                <p className="text-white/60 leading-relaxed">{f.description}</p>
+                <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">{f.title}</h3>
+                <p className="text-white/60 leading-relaxed text-sm sm:text-base">{f.description}</p>
               </div>
             </div>
           ))}

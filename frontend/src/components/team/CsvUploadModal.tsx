@@ -234,7 +234,7 @@ export function CsvUploadModal({ onImport, onClose }: CsvUploadModalProps) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl w-[560px] max-h-[85vh] flex flex-col"
+        className="bg-white rounded-2xl shadow-xl w-full max-w-[560px] mx-4 max-h-[85vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

@@ -14,7 +14,7 @@ interface AddEmployeeModalProps {
 export function AddEmployeeModal({ form, onChange, onSave, onClose }: AddEmployeeModalProps) {
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[60] animate-fade-in" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-xl w-[480px] p-6" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-[480px] mx-4 p-5 sm:p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-lg font-semibold text-slate-900">Add Employee</h3>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-all duration-150 p-1 rounded-lg hover:bg-slate-100">

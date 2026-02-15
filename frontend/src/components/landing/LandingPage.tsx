@@ -7,12 +7,12 @@ import { FooterCTA } from "./FooterCTA";
 
 export function LandingPage({ onGetStarted }: { onGetStarted: () => void }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden">
       {/* Grid Background Pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f12_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f12_1px,transparent_1px)] bg-[size:64px_64px] pointer-events-none" />
 
       {/* Header */}
-      <header className="relative z-20 px-6 py-6">
+      <header className="relative z-20 px-4 sm:px-6 py-4 sm:py-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
             SettleX
@@ -26,7 +26,7 @@ export function LandingPage({ onGetStarted }: { onGetStarted: () => void }) {
       <FooterCTA onGetStarted={onGetStarted} />
 
       {/* Footer */}
-      <footer className="relative border-t border-white/10 py-12 px-6">
+      <footer className="relative border-t border-white/10 py-8 sm:py-12 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">

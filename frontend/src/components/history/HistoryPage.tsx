@@ -35,12 +35,12 @@ function HistoryRow({
         onClick={onToggle}
         className="border-t border-slate-50 table-row-hover cursor-pointer"
       >
-        <td className="px-6 py-3.5 text-sm font-medium text-emerald-600">{payroll.id}</td>
-        <td className="px-6 py-3.5 text-sm text-slate-600">{payroll.date}</td>
-        <td className="px-6 py-3.5 text-sm text-slate-600">{payroll.employees}</td>
-        <td className="px-6 py-3.5 text-sm font-semibold text-slate-900 text-right">{formatCurrency(payroll.total)}</td>
-        <td className="px-6 py-3.5 text-sm text-slate-500 text-right">{payroll.fee}</td>
-        <td className="px-6 py-3.5">
+        <td className="px-4 sm:px-6 py-3.5 text-sm font-medium text-emerald-600">{payroll.id}</td>
+        <td className="px-4 sm:px-6 py-3.5 text-sm text-slate-600">{payroll.date}</td>
+        <td className="px-4 sm:px-6 py-3.5 text-sm text-slate-600">{payroll.employees}</td>
+        <td className="px-4 sm:px-6 py-3.5 text-sm font-semibold text-slate-900 text-right">{formatCurrency(payroll.total)}</td>
+        <td className="px-4 sm:px-6 py-3.5 text-sm text-slate-500 text-right hidden sm:table-cell">{payroll.fee}</td>
+        <td className="px-4 sm:px-6 py-3.5 hidden md:table-cell">
           <a
             href={`${EXPLORER_URL}/tx/${payroll.txHash}`}
             target="_blank"
@@ -51,8 +51,8 @@ function HistoryRow({
             {txHashDisplay}
           </a>
         </td>
-        <td className="px-6 py-3.5"><StatusBadge status={payroll.status} /></td>
-        <td className="px-6 py-3.5 text-right">
+        <td className="px-4 sm:px-6 py-3.5"><StatusBadge status={payroll.status} /></td>
+        <td className="px-4 sm:px-6 py-3.5 text-right">
           <button className="text-slate-400 hover:text-slate-600 transition-all duration-150" title="Download CSV">
             <Download className="w-4 h-4" />
           </button>
@@ -64,16 +64,16 @@ function HistoryRow({
             <div className="text-xs text-slate-500 uppercase tracking-wider mb-3 font-medium">Employee Breakdown</div>
             <div className="grid gap-2">
               {EMPLOYEES_SEED.slice(0, payroll.employees).map((emp) => (
-                <div key={emp.id} className="flex items-center justify-between bg-white rounded-xl px-4 py-3 border border-slate-100 shadow-sm">
+                <div key={emp.id} className="flex items-center justify-between bg-white rounded-xl px-3 sm:px-4 py-3 border border-slate-100 shadow-sm">
                   <div className="flex items-center gap-3">
                     <Avatar initials={emp.avatar} size="sm" />
                     <span className="text-sm font-medium text-slate-900">{emp.name}</span>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 sm:gap-4">
                     <span className="text-sm font-semibold text-slate-900">{formatCurrency(emp.amount)}</span>
-                    <span className="text-xs text-slate-400 bg-slate-50 px-2 py-0.5 rounded">{emp.currency}</span>
+                    <span className="text-xs text-slate-400 bg-slate-50 px-2 py-0.5 rounded hidden sm:inline">{emp.currency}</span>
                     <StatusBadge status="completed" />
-                    <span className="text-xs text-slate-400">{payroll.settlementTime}</span>
+                    <span className="text-xs text-slate-400 hidden sm:inline">{payroll.settlementTime}</span>
                   </div>
                 </div>
               ))}
@@ -93,7 +93,7 @@ export function HistoryPage({ filter, expandedId, onSetFilter, onToggleExpand, p
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Payroll History</h1>
           <p className="text-sm text-slate-500 mt-1">View past payroll batches and transaction details</p>
@@ -104,7 +104,7 @@ export function HistoryPage({ filter, expandedId, onSetFilter, onToggleExpand, p
             <button
               key={f}
               onClick={() => onSetFilter(f)}
-              className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-150 capitalize ${
+              className={`px-3 sm:px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-150 capitalize ${
                 filter === f ? "bg-emerald-600 text-white shadow-sm" : "bg-white border border-slate-200 text-slate-500 hover:bg-slate-50"
               }`}
             >
@@ -123,30 +123,32 @@ export function HistoryPage({ filter, expandedId, onSetFilter, onToggleExpand, p
           </div>
         ) : (
           <>
-            <table className="w-full">
-              <thead>
-                <tr className="text-xs text-slate-500 uppercase tracking-wider">
-                  <th className="text-left px-6 py-3 font-medium">Batch ID</th>
-                  <th className="text-left px-6 py-3 font-medium">Date</th>
-                  <th className="text-left px-6 py-3 font-medium">Employees</th>
-                  <th className="text-right px-6 py-3 font-medium">Total</th>
-                  <th className="text-right px-6 py-3 font-medium">Tx Fee</th>
-                  <th className="text-left px-6 py-3 font-medium">Tx Hash</th>
-                  <th className="text-left px-6 py-3 font-medium">Status</th>
-                  <th className="text-right px-6 py-3 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((p) => (
-                  <HistoryRow
-                    key={p.id}
-                    payroll={p}
-                    isExpanded={expandedId === p.id}
-                    onToggle={() => onToggleExpand(expandedId === p.id ? null : p.id)}
-                  />
-                ))}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[700px]">
+                <thead>
+                  <tr className="text-xs text-slate-500 uppercase tracking-wider">
+                    <th className="text-left px-4 sm:px-6 py-3 font-medium">Batch ID</th>
+                    <th className="text-left px-4 sm:px-6 py-3 font-medium">Date</th>
+                    <th className="text-left px-4 sm:px-6 py-3 font-medium">Employees</th>
+                    <th className="text-right px-4 sm:px-6 py-3 font-medium">Total</th>
+                    <th className="text-right px-4 sm:px-6 py-3 font-medium hidden sm:table-cell">Tx Fee</th>
+                    <th className="text-left px-4 sm:px-6 py-3 font-medium hidden md:table-cell">Tx Hash</th>
+                    <th className="text-left px-4 sm:px-6 py-3 font-medium">Status</th>
+                    <th className="text-right px-4 sm:px-6 py-3 font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((p) => (
+                    <HistoryRow
+                      key={p.id}
+                      payroll={p}
+                      isExpanded={expandedId === p.id}
+                      onToggle={() => onToggleExpand(expandedId === p.id ? null : p.id)}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
             {filtered.length === 0 && (
               <div className="px-6 py-12 text-center">
                 <p className="text-sm text-slate-400">No payroll records match this filter</p>
