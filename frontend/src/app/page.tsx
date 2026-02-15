@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useAccount } from "wagmi";
+import { LandingPage } from "@/components/landing/LandingPage";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Dashboard } from "@/components/dashboard/Dashboard";
 import { PayrollWizard } from "@/components/payroll/PayrollWizard";
@@ -56,13 +57,15 @@ export default function SettleXApp() {
       payrollToken.address,
       false,
       (txData, batchEmployees) => {
-        // Save to history
         payrollHistory.addRecord(txData, batchEmployees);
-        // Refetch on-chain stats
         settleX.refetchStats();
       },
     );
   }, [payroll, payment.processPayment, payrollToken.address, token, payrollHistory, settleX]);
+
+  if (nav.currentPage === "landing") {
+    return <LandingPage onGetStarted={() => nav.navigateTo("dashboard")} />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">

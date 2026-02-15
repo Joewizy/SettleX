@@ -29,7 +29,7 @@ function employeeToBatch(e: Employee): BatchEmployee {
 }
 
 export function useNavigation() {
-  const [currentPage, setCurrentPage] = useState<Page>("dashboard");
+  const [currentPage, setCurrentPage] = useState<Page>("landing");
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const navigateTo = useCallback((page: Page) => {

@@ -2,7 +2,7 @@ import type { Address } from "viem";
 
 // ─── Navigation ──────────────────────────────────────────────────────────────
 
-export type Page = "dashboard" | "payroll" | "team" | "history" | "batch";
+export type Page = "landing" | "dashboard" | "payroll" | "team" | "history" | "batch";
 export type PayrollStep = 1 | 2 | 3;
 export type SettlementState = "waiting" | "processing" | "confirmed" | "failed";
 export type HistoryFilter = "all" | "completed" | "failed";
